@@ -1,7 +1,7 @@
 # Личный проект «YetiCave»
 
 * Студент: [Alexey Koshevoy](https://up.htmlacademy.ru/php/9/user/929465).
-* Наставник: `Неизвестно`.
+* Наставник: [Михаил Куприянов](https://htmlacademy.ru/profile/id541075).
 
 ---
 
