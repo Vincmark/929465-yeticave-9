@@ -87,7 +87,7 @@
             <div class="lot-item__cost-state">
               <div class="lot-item__rate">
                 <span class="lot-item__amount">Текущая цена</span>
-                <span class="lot-item__cost"><?= preparePrice('10999') ?></span>
+                <span class="lot-item__cost"><?= preparePrice(10999) ?></span>
               </div>
               <div class="lot-item__min-cost">
                 Мин. ставка <span>12 000 р</span>
