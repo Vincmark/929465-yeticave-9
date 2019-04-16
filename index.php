@@ -1,4 +1,5 @@
 <?php
+require('functions.php');
 $is_auth = rand(0, 1);
 
 $user_name = 'Алексей Кошевой';
@@ -35,23 +36,6 @@ $lots = [
         'imageUrl' => 'img/lot-6.jpg']
 ];
 
-function preparePrice($amount){
-    $amount = ceil($amount);
-    $amountStr = (string)$amount;
-
-    $amountStr = number_format($amount, 0, '', ' ');
-
-    $amountStr = $amountStr . ' ₽';
-    return $amountStr;
-
-    //Округлить число до целого используя функцию ceil().
-    //    Если переданное число меньше 1000, то оставить его как есть.
-    //    Если число больше 1000, то отделить пробелом три последних цифры от остальной части суммы
-    //Пример: заменить 54999 на 54 999.
-    //Добавить к итоговой строке пробел и знак рубля — ₽.
-}
-
-echo preparePrice(1256000.555435);
 
 ?>
 <!DOCTYPE html>
@@ -122,11 +106,11 @@ echo preparePrice(1256000.555435);
                         </div>
                         <div class="lot__info">
                             <span class="lot__category"><?= $value['category'] ?></span>
-                            <h3 class="lot__title"><a class="text-link" href="pages/lot.html"><?= $value['title'] ?></a></h3>
+                            <h3 class="lot__title"><a class="text-link" href="pages/lot.php"><?= $value['title'] ?></a></h3>
                             <div class="lot__state">
                                 <div class="lot__rate">
                                     <span class="lot__amount">Стартовая цена</span>
-                                    <span class="lot__cost"><?= $value['price'] ?><b class="rub">р</b></span>
+                                    <span class="lot__cost"><?= preparePrice($value['price']) ?><!--<b class="rub">р</b>--></span>
                                 </div>
                                 <div class="lot__timer timer">
                                     12:23
