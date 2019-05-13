@@ -1,5 +1,6 @@
 <?php
-require('functions.php');
+
+require 'functions.php';
 $is_auth = rand(0, 1);
 
 $user_name = 'Алексей Кошевой';
@@ -36,15 +37,14 @@ $lots = [
         'imageUrl' => 'img/lot-6.jpg']
 ];
 
-
 ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Главная</title>
-    <link href="../css/normalize.min.css" rel="stylesheet">
-    <link href="../css/style.css" rel="stylesheet">
+    <link href="css/normalize.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
 <div class="page-wrapper">
@@ -53,7 +53,7 @@ $lots = [
         <div class="main-header__container container">
             <h1 class="visually-hidden">YetiCave</h1>
             <a class="main-header__logo">
-                <img src="../img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
+                <img src="img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
             </a>
             <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru" autocomplete="off">
                 <input type="search" name="search" placeholder="Поиск лота">
@@ -99,18 +99,18 @@ $lots = [
                 <h2>Открытые лоты</h2>
             </div>
             <ul class="lots__list">
-                <?php foreach ($lots as $value): ?>
+                <?php foreach ($lots as $lot): ?>
                     <li class="lots__item lot">
                         <div class="lot__image">
-                            <img src="<?= $value['imageUrl'] ?>" width="350" height="260" alt="">
+                            <img src="<?= $lot['imageUrl'] ?>" width="350" height="260" alt="">
                         </div>
                         <div class="lot__info">
-                            <span class="lot__category"><?= $value['category'] ?></span>
-                            <h3 class="lot__title"><a class="text-link" href="pages/lot.php"><?= $value['title'] ?></a></h3>
+                            <span class="lot__category"><?= $lot['category'] ?></span>
+                            <h3 class="lot__title"><a class="text-link" href="pages/lot.php"><?= $lot['title'] ?></a></h3>
                             <div class="lot__state">
                                 <div class="lot__rate">
                                     <span class="lot__amount">Стартовая цена</span>
-                                    <span class="lot__cost"><?= preparePrice($value['price']) ?><!--<b class="rub">р</b>--></span>
+                                    <span class="lot__cost"><?= preparePrice($lot['price']) ?></span>
                                 </div>
                                 <div class="lot__timer timer">
                                     12:23
@@ -129,7 +129,7 @@ $lots = [
         <ul class="nav__list container">
             <?php foreach ($categories as $category): ?>
                 <li class="nav__item">
-                    <a href="pages/all-lots.html"><?= $category ?></a>
+                    <a href="pages/all-lots.html"><?= $category?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
