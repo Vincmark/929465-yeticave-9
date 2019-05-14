@@ -37,6 +37,7 @@ $lots = [
         'imageUrl' => 'img/lot-6.jpg']
 ];
 
-$pageContent = include_template('index.php', ['categories' => $categories ,'lots' => $lots]);
+$timeBeforeMidnight = getHoursAndMinutesBeforeMidnight();
+$pageContent = include_template('index.php', ['categories' => $categories , 'lots' => $lots, 'timeBeforeMidnight' => $timeBeforeMidnight]);
 $layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Главная', 'is_auth' => $is_auth, 'user_name' => $user_name, 'categories' => $categories]);
 print($layoutContent);
