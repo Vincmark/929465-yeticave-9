@@ -27,12 +27,8 @@
                                 <span class="lot__amount">Стартовая цена</span>
                                 <span class="lot__cost"><?= preparePrice($lot['price']) ?></span>
                             </div>
-                            <?php if (lessThanHourBeforeMidnight()) :?>
-                            <div class="lot__timer timer timer--finishing">
-                            <?php else: ?>
-                            <div class="lot__timer timer">
-                            <?php endif ?>
-                                <?= $timeBeforeMidnight ?>
+                            <div class="lot__timer timer <?= lessThanHourBeforeMidnight() ? 'timer--finishing' : ''?> ">
+                                <?= getHoursAndMinutesBeforeMidnight(); ?>
                             </div>
                         </div>
                     </div>
