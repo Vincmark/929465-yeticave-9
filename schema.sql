@@ -20,18 +20,11 @@ create table categories (
                             symbol_code char(128)
 );
 
-insert into categories (title, symbol_code) VALUES ('Доски и лыжи', 'boards');
-insert into categories (title, symbol_code) VALUES ('Крепления', 'attachment');
-insert into categories (title, symbol_code) VALUES ('Ботинки', 'boots');
-insert into categories (title, symbol_code) VALUES ('Одежда', 'clothing');
-insert into categories (title, symbol_code) VALUES ('Инструменты', 'tools');
-insert into categories (title, symbol_code) VALUES ('Разное', 'other');
-
 create table lots (
                       id int auto_increment primary key,
                       id_category int not null,
                       id_author int not null,
-                      id_winner int not null,
+                      id_winner int default null,
                       date_reg timestamp default current_timestamp,
                       title char(128),
                       description varchar(4096),
