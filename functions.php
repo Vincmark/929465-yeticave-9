@@ -17,33 +17,42 @@ function preparePrice(int $price): string
 }
 
 /**
- * Возвращает строку с часами и минутами до конца текущих суток
+ * Возвращает строку с часами и минутами до конца жизни лота
  *
  * @return string
  */
-function getHoursAndMinutesBeforeMidnight(): string
+function getHoursAndMinutesBeforeLotEnd(string $endDate): string
 {
     $dateNow = strtotime('now');
-    $dateNextDay = strtotime('next day midnight');
-    $dateDiff = $dateNextDay - $dateNow;
-    $hours = floor($dateDiff/60/60);
-    $minutes = floor(($dateDiff-$hours*60*60)/60);
+    $dateEnd = strtotime($endDate);
+    $dateDiff = $dateEnd - $dateNow;
+    if ($dateDiff<0){
+        $hours = 0;
+        $minutes = 0;
+    } else {
+        $hours = floor($dateDiff/60/60);
+        $minutes = floor(($dateDiff-$hours*60*60)/60);
+    }
     return sprintf("%02d", $hours).":".sprintf("%02d", $minutes);
 }
 
 /**
- * Возвращает true, если от текущей даты до конца суок осталось меньше 1 часа
+ * Возвращает true, если от текущей даты до конца жизни лота осталось меньше 1 часа
  *
  * @return bool
  */
-function lessThanHourBeforeMidnight(): bool
+function lessThanHourBeforeLotEnd(string $endDate): bool
 {
     $dateNow = strtotime('now');
-    $dateNextDay = strtotime('next day midnight');
-    $dateDiff = $dateNextDay - $dateNow;
-    if ($dateDiff/60 >= 60) {
-        return false;
-    } else {
+    $dateEnd = strtotime($endDate);
+    $dateDiff = $dateEnd - $dateNow;
+    if ($dateDiff < 0) {
         return true;
+    } else {
+        if ($dateDiff / 60 >= 60) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
