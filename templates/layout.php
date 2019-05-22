@@ -21,7 +21,6 @@
                 <input class="main-header__search-btn" type="submit" name="find" value="Найти">
             </form>
             <a class="main-header__add-lot button" href="pages/add-lot.html">Добавить лот</a>
-
             <nav class="user-menu">
                 <?php if($is_auth === 1): ?>
                     <div class="user-menu__logged">
@@ -55,7 +54,7 @@
         <ul class="nav__list container">
             <?php foreach ($categories as $category): ?>
                 <li class="nav__item">
-                    <a href="pages/all-lots.html"><?= $category?></a>
+                    <a href="pages/all-lots.html"><?= $category['title'] ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
