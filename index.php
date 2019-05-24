@@ -4,6 +4,7 @@ require 'functions.php';
 require 'helpers.php';
 $is_auth = rand(0, 1);
 $user_name = 'Алексей Кошевой';
+$is_main = 1;
 
 $dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
 if ($dbConnection == false) {
@@ -31,5 +32,5 @@ else {
 }
 
 $pageContent = include_template('index.php', ['categories' => $categories , 'lots' => $lots]);
-$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Главная', 'is_auth' => $is_auth, 'user_name' => $user_name, 'categories' => $categories]);
+$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Главная', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
 print($layoutContent);
