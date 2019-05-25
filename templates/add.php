@@ -22,13 +22,14 @@
         <textarea id="message" name="message" placeholder="Напишите описание лота"><?= $formError ? $formParams['message'] : ''?></textarea>
         <span class="form__error">Напишите описание лота</span>
     </div>
-    <div class="form__item form__item--file">
+    <div class="form__item form__item--file <?= $formItemErrors['image'] ? 'form__item--invalid' : ''?>">
         <label>Изображение <sup>*</sup></label>
         <div class="form__input-file">
-            <input class="visually-hidden" type="file" name=image" id="lot-img" value="">
+            <input class="visually-hidden" type="file" name="image" id="lot-img" value="">
             <label for="lot-img">
                 Добавить
             </label>
+            <span class="form__error">Выберите картинку для лота</span>
         </div>
     </div>
     <div class="form__container-three">

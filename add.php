@@ -55,9 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formParams['lot-rate'] = $_POST['lot-rate'];
         if (!is_numeric($formParams['lot-rate']))
             $formItemErrors['lot-rate'] = true;
-        else {
-            $formParams['lot-rate'] = $_POST['lot-rate'];
-        }
+        else if (intval($formParams['lot-rate'])<0)
+                $formItemErrors['lot-rate'] = true;
     }
 
     // lot-step
@@ -68,9 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formParams['lot-step'] = $_POST['lot-step'];
         if (((string)intval($formParams['lot-step'])) !== $formParams['lot-step'])
             $formItemErrors['lot-step'] = true;
-        else {
-            $formParams['lot-step'] = $_POST['lot-step'];
-        }
+        else if (intval($formParams['lot-step'])<0)
+            $formItemErrors['lot-step'] = true;
     }
 
     // lot-date
@@ -81,36 +79,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formParams['lot-date'] = $_POST['lot-date'];
         if (!is_date_valid($formParams['lot-date']))
             $formItemErrors['lot-date'] = true;
+        else {
+            $dateNow = strtotime('now');
+            $dateLot = strtotime($formParams['lot-date']);
+            if (($dateLot-$dateNow)<24*60*60)
+                $formItemErrors['lot-date'] = true;
+        }
     }
     // image
-    $formParams['image'] = 'test_image_path.jpg';
-//    if (isset($_FILES['image'])) {
-//        $file_name = $_FILES['image']['name'];
-//        $file_path = __DIR__. '/uploads/';
-//        $file_url = '/uploads/' . $file_name;
-//        move_uploaded_file($_FILES['image']['tmp_name'], $file_path . $file_name);
-//        print("<a href='$file_url'>$file_name<a>");
-//    }
+    $formParams['image'] = '';
+    if (isset($_FILES['image'])) {
+        if ($_FILES['image']['error']!==0) {
+            $formItemErrors['image'] = true;
+        }
+        if (!isset($formItemErrors['image'])) {
+            $file_temp_name = $_FILES['image']['tmp_name'];
+            $file_mime = mime_content_type ($file_temp_name);
+            if (( $file_mime !== 'image/png')&&( $file_mime !== 'image/jpeg')) {
+                $formItemErrors['image'] = true;
+            }
+        }
+        if (!isset($formItemErrors['image'])) {
+            $path_parts = pathinfo($_FILES['image']['name']);
+            $file_name = uniqid().'.'.$path_parts['extension'];
+            $file_path = __DIR__. '/uploads/';
+            $file_url = '/uploads/' . $file_name;
+            $formParams['image'] = $file_name;
+        }
+    } else{
+        $formItemErrors['image'] = true;
+    }
     $formParams['author']='1';
-
     if (count($formItemErrors)>0)
         $formError = true;
 
 
-    echo "<pre>";
-    var_dump($formParams);
-    var_dump($formItemErrors);
-    var_dump($formError);
-    echo "</pre>";
-
     // Сохраняем новый лот
-
     if (!$formError) {
+
         $sql = 'insert into lots (id_category, id_author, title, description, lot_img, start_price, bet_step, stop_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         $stmt = mysqli_stmt_init($dbConnection);
         mysqli_stmt_prepare($stmt, $sql);
-        //$stmt = mysqli_prepare($dbConnection, $sql);
-
         $bindResult = mysqli_stmt_bind_param($stmt, 'iisssiis', $formParams['category'], $formParams['author'], $formParams['lot-name'], $formParams['message'], $formParams['image'], $formParams['lot-rate'], $formParams['lot-step'], $formParams['lot-date']);
         $executeResult = mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -118,9 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
             print("Ошибка MySQL: " . mysqli_errno($dbConnection));
             die();
         } else {
-            echo 'inserted';
-            mysqli_stmt_close($stmt);
             $newLotId = mysqli_insert_id($dbConnection);
+            mysqli_stmt_close($stmt);
+            move_uploaded_file($_FILES['image']['tmp_name'], $file_path . $file_name);
             header("Location: /lot.php?id=".$newLotId);
         }
     }
