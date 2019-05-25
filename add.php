@@ -6,6 +6,8 @@ $is_auth = rand(0, 1);
 $user_name = 'Алексей Кошевой';
 $is_main = 0;
 
+
+
 $formParams = [];
 $formItemErrors = [];
 $formError = false;
@@ -26,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formItemErrors['lot-name'] = true;
         $formParams['lot-name'] = '';
     } else {
-        $formParams['lot-name'] = $_POST['lot-name'];
+        $formParams['lot-name'] = mysqli_real_escape_string($dbConnection, $_POST['lot-name']);
     }
 
     // category
@@ -42,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formItemErrors['message'] = true;
         $formParams['message'] = '';
     } else {
-        $formParams['message'] = $_POST['message'];
+        $formParams['message'] = mysqli_real_escape_string($dbConnection, $_POST['message']);
     }
 
     // lot-rate
@@ -53,6 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formParams['lot-rate'] = $_POST['lot-rate'];
         if (!is_numeric($formParams['lot-rate']))
             $formItemErrors['lot-rate'] = true;
+        else {
+            $formParams['lot-rate'] = $_POST['lot-rate'];
+        }
     }
 
     // lot-step
@@ -63,6 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formParams['lot-step'] = $_POST['lot-step'];
         if (((string)intval($formParams['lot-step'])) !== $formParams['lot-step'])
             $formItemErrors['lot-step'] = true;
+        else {
+            $formParams['lot-step'] = $_POST['lot-step'];
+        }
     }
 
     // lot-date
@@ -75,13 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
             $formItemErrors['lot-date'] = true;
     }
     // image
-    if (isset($_FILES['image'])) {
-        $file_name = $_FILES['image']['name'];
-        $file_path = __DIR__. '/uploads/';
-        $file_url = '/uploads/' . $file_name;
-        move_uploaded_file($_FILES['image']['tmp_name'], $file_path . $file_name);
-        print("<a href='$file_url'>$file_name<a>");
-    }
+    $formParams['image'] = 'test_image_path.jpg';
+//    if (isset($_FILES['image'])) {
+//        $file_name = $_FILES['image']['name'];
+//        $file_path = __DIR__. '/uploads/';
+//        $file_url = '/uploads/' . $file_name;
+//        move_uploaded_file($_FILES['image']['tmp_name'], $file_path . $file_name);
+//        print("<a href='$file_url'>$file_name<a>");
+//    }
+    $formParams['author']='1';
 
     if (count($formItemErrors)>0)
         $formError = true;
@@ -96,40 +106,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     // Сохраняем новый лот
 
     if (!$formError) {
-    //            id_category int not null,
-    //            id_author int not null,
-    //            id_winner int default null,
-    //            title char(128),
-    //            description varchar(4096),
-    //            lot_img char(255),
-    //            start_price decimal,
-    //            bet_step decimal,
-    //            stop_date date,
-    //    insert into lots (id_category,id_author,title,description,lot_img,start_price,bet_step,stop_date) VALUES (5, 2,  'Маска Oakley Canopy', 'Легкий маневренный сноуборд, готовый дать жару в любом парке, растопив снег мощным щелчкоми четкими дугами. Стекловолокно Bi-Ax, уложенное в двух направлениях, наделяет этот снаряд отличной гибкостью и отзывчивостью, а симметричная геометрия в сочетании с классическим прогибом кэмбер позволит уверенно держать высокие скорости. А если к концу катального дня сил совсем не останется, просто посмотрите на Вашу доску и улыбнитесь, крутая графика от Шона Кливера еще никого не оставляла равнодушным.', 'lot-6.jpg', 5400, 1000, '2017-05-26');
-//        $sql = 'select l.id, l.title, description, start_price, lot_img, stop_date, c.title as category_title from lots l join categories c on l.id_category = c.id where l.id=?';
+        $sql = 'insert into lots (id_category, id_author, title, description, lot_img, start_price, bet_step, stop_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        $stmt = mysqli_stmt_init($dbConnection);
+        mysqli_stmt_prepare($stmt, $sql);
+        //$stmt = mysqli_prepare($dbConnection, $sql);
 
-        $sql = 'insert into lots (id_category,id_author,title,description,lot_img,start_price,bet_step,stop_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        $stmt = mysqli_prepare($dbConnection, $sql);
-        mysqli_stmt_bind_param($stmt, 'iisssdis', $formParams['category'], 1, $formParams['author'], $formParams['lot-name'], $formParams['message'],$formParams['image'],$formParams['lot_rate'],$formParams['lot_step'],$formParams['lot-date']);
-        mysqli_stmt_execute($stmt);
+        $bindResult = mysqli_stmt_bind_param($stmt, 'iisssiis', $formParams['category'], $formParams['author'], $formParams['lot-name'], $formParams['message'], $formParams['image'], $formParams['lot-rate'], $formParams['lot-step'], $formParams['lot-date']);
+        $executeResult = mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
-        if (!$result) {
-            print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        if (!$executeResult) {
+            print("Ошибка MySQL: " . mysqli_errno($dbConnection));
             die();
         } else {
-            $records_count = mysqli_num_rows($result);
-            if ($records_count>0){
-                $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
-                $lot = $lots[0];
-            } else {
-                print('no such id');
-                http_response_code(404);
-                die();
-            }
+            echo 'inserted';
+            mysqli_stmt_close($stmt);
+            $newLotId = mysqli_insert_id($dbConnection);
+            header("Location: /lot.php?id=".$newLotId);
         }
-
-        // перенаправление
-
     }
 }
 
