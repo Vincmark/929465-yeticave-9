@@ -10,7 +10,6 @@ if (isset($_SESSION['username'])) {
 } else {
     $is_auth = 0;
     $user_name = '';
-    echo "no session";
 }
 
 $is_main = 0;
@@ -44,7 +43,6 @@ if ($dbConnection == false) {
             $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
             $lot = $lots[0];
         } else {
-            print('no such id');
             http_response_code(404);
             die();
         }
@@ -60,6 +58,6 @@ if ($dbConnection == false) {
     }
 }
 
-$pageContent = include_template('lot.php', ['categories' => $categories , 'lot' => $lot]);
-$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Лот', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
+$pageContent = include_template('lot.php', ['categories' => $categories , 'lot' => $lot, 'is_auth' => $is_auth]);
+$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => $lot['title'], 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
 print($layoutContent);

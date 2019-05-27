@@ -10,7 +10,8 @@ if (isset($_SESSION['username'])) {
 } else {
     $is_auth = 0;
     $user_name = '';
-    echo "no session";
+    http_response_code(403);
+    die();
 }
 
 $is_main = 0;
@@ -154,5 +155,5 @@ if (!$result) {
 
 
 $pageContent = include_template('add.php', ['categories' => $categories, 'formParams' => $formParams, 'formError' => $formError, 'formItemErrors' => $formItemErrors]);
-$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Добавить лот', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
+$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Добавление лота', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
 print($layoutContent);

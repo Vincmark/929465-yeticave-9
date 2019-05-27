@@ -10,7 +10,6 @@ if (isset($_SESSION['username'])) {
 } else {
     $is_auth = 0;
     $user_name = '';
-    echo "no session";
 }
 
 $is_main = 1;

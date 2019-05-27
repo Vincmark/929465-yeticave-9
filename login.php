@@ -10,7 +10,6 @@ if (isset($_SESSION['username'])) {
 } else {
     $is_auth = 0;
     $user_name = '';
-    echo "no session";
 }
 
 $is_main = 0;
@@ -19,6 +18,7 @@ $is_main = 0;
 $formParams = [];
 $formItemErrors = [];
 $formError = false;
+$userIdentificationError = false;
 
 $dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
 if ($dbConnection == false) {
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formItemErrors['email'] = true;
     if (!isset($formItemErrors['email'])) {
         $formParams['email'] = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
-        if (!isset($formItemErrors['email'])) {
+        if ($formParams['email']!==false) {
             $formParams['email'] = mysqli_real_escape_string($dbConnection, $_POST['email']);
         } else {
             $formParams['email'] = mysqli_real_escape_string($dbConnection, $_POST['email']);
@@ -59,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     if (count($formItemErrors)>0)
         $formError = true;
 
-    $userIdentified = false;
     if (!$formError) {
         $sql = 'select id, email, name, password from users where email = ?';
         $stmt = mysqli_stmt_init($dbConnection);
@@ -67,9 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $bindResult = mysqli_stmt_bind_param($stmt, 's', $formParams['email']);
         $executeResult = mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
-        echo "<pre>";
-        var_dump($result);
-        echo "</pre>";
         if (!$executeResult) {
             print("Ошибка MySQL: " . mysqli_errno($dbConnection));
             die();
@@ -78,19 +74,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
             if ($num_rows > 0) {
                 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 if (password_verify($formParams['password'], $users[0]['password'])) {
-                    $userIdentified = true;
                     session_start();
                     $_SESSION['username'] = $users[0]['name'];
                     header("Location: /index.php");
+                } else {
+                    $userIdentificationError = true;
+                    $formError = true;
                 }
+            } else {
+                $userIdentificationError = true;
+                $formError = true;
             }
             mysqli_stmt_close($stmt);
         }
-    }
-    if (!$userIdentified) {
-        $formItemErrors['password'] = true;
-        $formItemErrors['email'] = true;
-        $formError = true;
     }
 }
 
@@ -104,6 +100,6 @@ if (!$result) {
 }
 
 
-$pageContent = include_template('login.php', ['formParams' => $formParams, 'formError' => $formError, 'formItemErrors' => $formItemErrors]);
-$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Добавить лот', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
+$pageContent = include_template('login.php', ['formParams' => $formParams, 'formError' => $formError, 'formItemErrors' => $formItemErrors, 'userIdentificationError' => $userIdentificationError]);
+$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Вход', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
 print($layoutContent);
