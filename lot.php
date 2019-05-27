@@ -2,8 +2,17 @@
 
 require 'functions.php';
 require 'helpers.php';
-$is_auth = rand(0, 1);
-$user_name = 'Алексей Кошевой';
+
+session_start();
+if (isset($_SESSION['username'])) {
+    $is_auth = 1;
+    $user_name = $_SESSION['username'];
+} else {
+    $is_auth = 0;
+    $user_name = '';
+    echo "no session";
+}
+
 $is_main = 0;
 
 // Проверяем параметр из URL

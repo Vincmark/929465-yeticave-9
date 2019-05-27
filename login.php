@@ -2,8 +2,17 @@
 
 require 'functions.php';
 require 'helpers.php';
-$is_auth = rand(0, 1);
-$user_name = 'Алексей Кошевой';
+
+session_start();
+if (isset($_SESSION['username'])) {
+    $is_auth = 1;
+    $user_name = $_SESSION['username'];
+} else {
+    $is_auth = 0;
+    $user_name = '';
+    echo "no session";
+}
+
 $is_main = 0;
 
 
@@ -19,7 +28,6 @@ if ($dbConnection == false) {
     mysqli_set_charset($dbConnection, "utf8");
 }
 
-// Обрабатываем добавление или просто показываем форму?
 if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
     // email
@@ -30,33 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $formItemErrors['email'] = true;
     if (!isset($formItemErrors['email'])) {
         $formParams['email'] = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
-        if ($formParams['email'] !== false) {
+        if (!isset($formItemErrors['email'])) {
             $formParams['email'] = mysqli_real_escape_string($dbConnection, $_POST['email']);
         } else {
             $formParams['email'] = mysqli_real_escape_string($dbConnection, $_POST['email']);
             $formItemErrors['email'] = true;
-        }
-    }
-    if (!isset($formItemErrors['email'])) {
-        $sql = 'select id, email, password from users where email = ?';
-        $stmt = mysqli_stmt_init($dbConnection);
-        mysqli_stmt_prepare($stmt, $sql);
-        $bindResult = mysqli_stmt_bind_param($stmt, 's', $formParams['email']);
-        $executeResult = mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-
-        if (!$executeResult) {
-            print("Ошибка MySQL: " . mysqli_errno($dbConnection));
-            die();
-        } else {
-            $num_rows = mysqli_num_rows($result);
-            if ($num_rows > 0) {
-                $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
-                echo $users[0]['email'];
-                echo $users[0]['password'];
-            }
-
-            mysqli_stmt_close($stmt);
         }
     }
 
@@ -64,28 +50,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $formParams['password'] = '';
     if (empty($_POST['password']))
         $formItemErrors['password'] = true;
-    if (!isset($formItemErrors['password']) && (strlen($_POST['password']) > 0))
-        $formParams['password'] = password_hash($_POST['password'],PASSWORD_DEFAULT);
+    if (!isset($formItemErrors['password']) && (strlen($_POST['password']) === 0))
+        $formItemErrors['password'] = true;
+    if (!isset($formItemErrors['password']))
+        $formParams['password'] = $_POST['password'];
+
 
     if (count($formItemErrors)>0)
         $formError = true;
 
-
-    // Сохраняем нового пользователя
+    $userIdentified = false;
     if (!$formError) {
-        $sql = 'insert into users (email, name, password, contact) VALUES (?, ?, ?, ?)';
+        $sql = 'select id, email, name, password from users where email = ?';
         $stmt = mysqli_stmt_init($dbConnection);
         mysqli_stmt_prepare($stmt, $sql);
-        $bindResult = mysqli_stmt_bind_param($stmt, 'ssss', $formParams['email'], $formParams['name'], $formParams['password'], $formParams['message']);
+        $bindResult = mysqli_stmt_bind_param($stmt, 's', $formParams['email']);
         $executeResult = mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
+        echo "<pre>";
+        var_dump($result);
+        echo "</pre>";
         if (!$executeResult) {
             print("Ошибка MySQL: " . mysqli_errno($dbConnection));
             die();
         } else {
+            $num_rows = mysqli_num_rows($result);
+            if ($num_rows > 0) {
+                $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                if (password_verify($formParams['password'], $users[0]['password'])) {
+                    $userIdentified = true;
+                    session_start();
+                    $_SESSION['username'] = $users[0]['name'];
+                    header("Location: /index.php");
+                }
+            }
             mysqli_stmt_close($stmt);
-            header("Location: /login.php");
         }
+    }
+    if (!$userIdentified) {
+        $formItemErrors['password'] = true;
+        $formItemErrors['email'] = true;
+        $formError = true;
     }
 }
 

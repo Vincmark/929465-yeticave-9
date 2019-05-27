@@ -10,5 +10,6 @@
         <input id="password" type="password" name="password" placeholder="Введите пароль">
         <span class="form__error">Введите пароль</span>
     </div>
+    <span class="form__error form__error--bottom">Пожалуйста, исправьте ошибки в форме.</span>
     <button type="submit" class="button">Войти</button>
 </form>
