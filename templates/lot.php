@@ -30,6 +30,7 @@
         <input id="cost" type="text" name="cost" placeholder="<?= $betForm['minBetPrice'] ?>" value="<?= $formError ? $formParams['cost'] : ''?>">
         <input type="hidden" name="lot_id" value="<?= $lot['id'] ?>">
         <input type="hidden" name="min_price" value="<?= $betForm['minBetPrice'] ?>">
+        <input type="hidden" name="lot_life_time" value="<?= $lot['stop_date'] ?>">
         <span class="form__error">Введите наименование лота</span>
     </p>
     <button type="submit" class="button">Сделать ставку</button>

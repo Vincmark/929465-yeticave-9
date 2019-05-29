@@ -39,6 +39,8 @@ if ($dbConnection == false) {
     // Записываем новую ставку
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+
+
         if (empty($_POST['cost'])) {
             $formItemErrors['cost'] = true;
             $formParams['cost'] = '';
@@ -52,9 +54,17 @@ if ($dbConnection == false) {
                 $formItemErrors['cost'] = true;
         }
 
+        $dateNow = strtotime('now');
+        $dateLotStop = strtotime($_POST['lot_life_time']);
+        if($dateLotStop <= $dateNow) {
+            echo "date";
+            $formError = true;
+        }
 
         if (count($formItemErrors)>0)
             $formError = true;
+
+
         if (!$formError) {
             $sql = 'insert into bets (id_bettor, id_lot, bet_price) VALUES (?, ?, ?)';
             $stmt = mysqli_stmt_init($dbConnection);
@@ -68,6 +78,7 @@ if ($dbConnection == false) {
             } else {
                 mysqli_stmt_close($stmt);
                 echo "saved";
+                header("Location: /lot.php?id=".$lotId);
             }
         }
     }
