@@ -15,6 +15,8 @@ if (isset($_SESSION['username'])) {
 
 $is_main = 1;
 
+echo getTimeString(strtotime('now'));
+
 $dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
 if ($dbConnection == false) {
     print("Ошибка подключения: ". mysqli_connect_error());
