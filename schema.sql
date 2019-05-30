@@ -36,6 +36,7 @@ create table lots (
     foreign key (id_author) references users(id),
     foreign key (id_winner) references users(id)
 );
+CREATE FULLTEXT INDEX lot_ft_search ON lots(title, description);
 
 create table bets (
     id int auto_increment primary key,
