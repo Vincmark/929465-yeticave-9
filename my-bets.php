@@ -11,6 +11,8 @@ if (isset($_SESSION['username'])) {
 } else {
     $is_auth = 0;
     $user_name = '';
+    http_response_code(403);
+    die();
 }
 
 $is_main = 0;
@@ -24,7 +26,7 @@ if ($dbConnection == false) {
     mysqli_set_charset($dbConnection, "utf8");
 
     // Зачитываем ставки
-    $sql = 'select b.id, b.bet_price,l.id_winner, l.title as lot_title, b.bet_date, l.stop_date, b.id_bettor, b.id_lot, l.lot_img as lot_img, l.id as lot_id, u.id, c.title as category_title  from bets b join lots l on b.id_lot=l.id join users u on b.id_bettor=u.id join categories c on l.id_category=c.id where b.id_bettor=? order by bet_date desc ';
+    $sql = 'select b.id,u.contact, b.bet_price,l.id_winner, l.title as lot_title, b.bet_date, l.stop_date, b.id_bettor, b.id_lot, l.lot_img as lot_img, l.id as lot_id, u.id, c.title as category_title  from bets b join lots l on b.id_lot=l.id join users u on b.id_bettor=u.id join categories c on l.id_category=c.id where b.id_bettor=? order by bet_date desc ';
 
     $stmt = mysqli_prepare($dbConnection, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $user_id);
@@ -35,22 +37,30 @@ if ($dbConnection == false) {
         die();
     } else {
         $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        $bets['minutesBeforeLotEnd'] = getMinutesBeforeLotEnd();
-        if ($bets['minutesBeforeLotEnd'] > 0) {
-            if ($bets['minutesBeforeLotEnd'] < 60) {
-                // красный
+        $i=0;
+        foreach ($bets as $bet) {
+            $bet['minutesBeforeLotEnd'] = getMinutesBeforeLotEnd($bet['stop_date']);
+            $bets[$i]['minutesBeforeLotEnd'] = $bet['minutesBeforeLotEnd'];
+            if ($bet['minutesBeforeLotEnd'] > 0) {
+                if ($bet['minutesBeforeLotEnd'] < 60) {
+                    $bets[$i]['lotState'] = 'red';
+                    // красный
+                } else {
+                    $bets[$i]['lotState'] = 'normal';
+                    // нормальный
+                }
             } else {
-                // нормальный
+                if ($bet['id_winner'] === $user_id) {
+                    // победитель
+                    $bets[$i]['lotState'] = 'winner';
+                } else {
+                    // лот закрыт
+                    $bets[$i]['lotState'] = 'closed';
+                }
             }
-        } else {
-            if ($bets['id_winner'] === $user_id) {
-                // победитель
-            } else {
-                // лот закрыт
-            }
+            $i++;
         }
     }
-
     // Зачитываем категории
     $sql = 'select title,symbol_code from categories';
     $result = mysqli_query($dbConnection, $sql);
@@ -59,7 +69,6 @@ if ($dbConnection == false) {
     } else {
         $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
-
 }
 
 $pageContent = include_template('my-bets.php', ['bets' => $bets]);

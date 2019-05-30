@@ -23,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $lotId = intval($_GET['id']);
 } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $lotId = intval($_POST['lot_id']);
-    echo "POST";
 }
 if ($lotId < 0) {
     http_response_code(404);
@@ -57,7 +56,6 @@ if ($dbConnection == false) {
         $dateNow = strtotime('now');
         $dateLotStop = strtotime($_POST['lot_life_time']);
         if($dateLotStop <= $dateNow) {
-            echo "date";
             $formError = true;
         }
 
@@ -77,7 +75,6 @@ if ($dbConnection == false) {
                 die();
             } else {
                 mysqli_stmt_close($stmt);
-                echo "saved";
                 header("Location: /lot.php?id=".$lotId);
             }
         }
@@ -120,7 +117,6 @@ if ($dbConnection == false) {
         die();
     } else {
         $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        echo count($bets);
     }
 
     // Отображаем форму для ставки
