@@ -5,9 +5,9 @@
         <tr class="rates__item">
             <td class="rates__info">
                 <div class="rates__img">
-                    <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="Сноуборд">
+                    <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= $bet['lot_title'] ?>">
                 </div>
-                <h3 class="rates__title"><a href="lot.html?id=<?= $bet['lot_id'] ?>"><?= $bet['lot_title'] ?></a></h3>
+                <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= $bet['lot_title'] ?></a></h3>
             </td>
             <td class="rates__category">
                 <?= $bet['category_title'] ?>

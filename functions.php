@@ -37,6 +37,18 @@ function getHoursAndMinutesBeforeLotEnd(string $endDate): string
 }
 
 /**
+ * Возвращает количество минут до конца жизни ставки
+ *
+ * @return int
+ */
+function getMinutesBeforeLotEnd(string $endDate): int
+{
+    $dateNow = strtotime('now');
+    $dateEnd = strtotime($endDate);
+    return floor(($dateEnd - $dateNow)/60);
+}
+
+/**
  * Возвращает true, если от текущей даты до конца жизни лота осталось меньше 1 часа
  *
  * @param string $endDate дата окончания жизни лота
