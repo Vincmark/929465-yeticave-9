@@ -1,6 +1,9 @@
 <div class="container">
     <section class="lots">
-        <h2>Результаты поиска по запросу «<span>Union</span>»</h2>
+        <?php if ($formError): ?>
+        <h2>Ничего не найдено</h2>
+        <?php else: ?>
+        <h2>Результаты поиска по запросу «<span><?= $query ?></span>»</h2>
         <ul class="lots__list">
             <?php foreach ($lots as $lot): ?>
                 <li class="lots__item lot">
@@ -32,4 +35,5 @@
         <li class="pagination-item"><a href="#">4</a></li>
         <li class="pagination-item pagination-item-next"><a href="#">Вперед</a></li>
     </ul>
+    <?php endif; ?>
 </div>

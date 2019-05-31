@@ -34,9 +34,9 @@ create table lots (
     stop_date date,
     foreign key (id_category) references categories(id),
     foreign key (id_author) references users(id),
-    foreign key (id_winner) references users(id)
+    foreign key (id_winner) references users(id),
+    FULLTEXT (title,description)
 );
-CREATE FULLTEXT INDEX lot_ft_search ON lots(title, description);
 
 create table bets (
     id int auto_increment primary key,
