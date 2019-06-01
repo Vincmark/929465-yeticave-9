@@ -22,7 +22,8 @@ if ($dbConnection == false) {
 } else {
     mysqli_set_charset($dbConnection, "utf8");
     // Зачитываем лоты
-    $sql = 'select l.id as lot_id, l.title, start_price, lot_img, stop_date, c.title as category_title from lots l join categories c on l.id_category = c.id where date_reg <= stop_date  order by date_reg desc';
+    $sql = 'select l.id as lot_id, l.title, start_price, lot_img, stop_date, c.title as category_title from lots l join categories c on l.id_category = c.id where stop_date >="'.date('y-m-d',strtotime('now')).'" order by date_reg desc';
+    //echo $sql;
     $result = mysqli_query($dbConnection, $sql);
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));

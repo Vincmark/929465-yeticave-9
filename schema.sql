@@ -34,7 +34,8 @@ create table lots (
     stop_date date,
     foreign key (id_category) references categories(id),
     foreign key (id_author) references users(id),
-    foreign key (id_winner) references users(id)
+    foreign key (id_winner) references users(id),
+    FULLTEXT (title,description)
 );
 
 create table bets (
