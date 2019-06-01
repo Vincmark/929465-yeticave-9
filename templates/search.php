@@ -1,7 +1,7 @@
 <div class="container">
     <section class="lots">
         <?php if ($formError): ?>
-        <h2>Ничего не найдено</h2>
+        <h2>Ничего не найдено по вашему запросу</h2>
         <?php else: ?>
         <h2>Результаты поиска по запросу «<span><?= $query ?></span>»</h2>
         <ul class="lots__list">
@@ -27,13 +27,18 @@
             <?php endforeach; ?>
         </ul>
     </section>
+    <?php if (count($pages) > 1):?>
     <ul class="pagination-list">
-        <li class="pagination-item pagination-item-prev"><a>Назад</a></li>
-        <li class="pagination-item pagination-item-active"><a>1</a></li>
-        <li class="pagination-item"><a href="#">2</a></li>
-        <li class="pagination-item"><a href="#">3</a></li>
-        <li class="pagination-item"><a href="#">4</a></li>
-        <li class="pagination-item pagination-item-next"><a href="#">Вперед</a></li>
+        <li class="pagination-item pagination-item-prev"><a href="search.php?search=<?= $query ?>&page=<?= $pagination['prev'] ?>">Назад</a></li>
+        <?php foreach ($pages as $page): ?>
+        <?php if ($pagination['current'] == $page): ?>
+        <li class="pagination-item pagination-item-active"><a><?= $page ?></a></li>
+        <?php else: ?>
+        <li class="pagination-item"><a href="search.php?search=<?= $query ?>&page=<?= $page ?>"><?= $page ?></a></li>
+        <?php endif; ?>
+        <?php endforeach; ?>
+        <li class="pagination-item pagination-item-next"><a href="search.php?search=<?= $query ?>&page=<?= $pagination['next'] ?>">Вперед</a></li>
     </ul>
+    <?php endif; ?>
     <?php endif; ?>
 </div>
