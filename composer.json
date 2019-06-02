@@ -1,0 +1,12 @@
+{
+    "name": "vincent/929465-yeticave-9",
+    "authors": [
+        {
+            "name": "Alexey Koshevoy",
+            "email": "gphtechak@gmail.com"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.2"
+    }
+}

@@ -1,7 +1,10 @@
 <?php
 
+require_once "vendor/autoload.php";
+
 require 'functions.php';
 require 'helpers.php';
+require 'getwinner.php';
 
 session_start();
 if (isset($_SESSION['username'])) {
