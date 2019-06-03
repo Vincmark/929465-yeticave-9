@@ -91,3 +91,34 @@ function getTimeString(string $postDate): string
     }
     return $result;
 }
+
+/**
+ * Рассылает письма победителям
+ *
+ * @param array $winnerList список победителей с параметрами для отправки писем
+ * @return bool
+ */
+function sendWinnerMails(array $winnerList)
+{
+
+    // Конфигурация траспорта
+    $transport = new Swift_SmtpTransport('smtp.example.org', 25);
+    foreach ($winnerList as $winner) {
+        // Формирование сообщения
+        $message = new Swift_Message("Просмотры вашей гифки");
+        $message->setTo([".$winner['id']." => "$winner[$lot['id']]['user_name']"]);
+        $message->setBody(
+            '<h1>Поздравляем с победой</h1>' .
+            '<p>Здравствуйте, \[имя пользователя\]</p>' .
+            '<p>Ваша ставка для лота <a href="\[ссылка на лот\]">\[имя лота\]</a> победила.</p>' .
+            '<p>Перейдите по ссылке <a href="\[ссылка на страницу мои ставки\]">мои ставки</a>, чтобы связаться с автором объявления</p>' .
+            '<small>Интернет Аукцион "YetiCave"</small>','text/html'
+        );
+
+        $message->setFrom("mail@giftube.academy", "GifTube");
+
+        // Отправка сообщения
+        $mailer = new Swift_Mailer($transport);
+        $mailer->send($message);
+    }
+}

@@ -1,12 +1,13 @@
 <?php
 
 require_once "vendor/autoload.php";
+session_start();
 
 require 'functions.php';
 require 'helpers.php';
 require 'getwinner.php';
 
-session_start();
+
 if (isset($_SESSION['username'])) {
     $is_auth = 1;
     $user_name = $_SESSION['username'];
