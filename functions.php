@@ -100,18 +100,24 @@ function getTimeString(string $postDate): string
  */
 function sendWinnerMails(array $winnerList)
 {
+    echo "Sending mails <br>";
 
     // Конфигурация траспорта
     $transport = new Swift_SmtpTransport('smtp.example.org', 25);
     foreach ($winnerList as $winner) {
+        echo "New mail <br>";
         // Формирование сообщения
         $message = new Swift_Message("Просмотры вашей гифки");
-        $message->setTo([".$winner['id']." => "$winner[$lot['id']]['user_name']"]);
+        echo "name ".$winner['user_name']."<br>";
+        echo "email ".$winner['user_email']."<br>";
+
+
+        $message->setTo([$winner['user_email'] => $winner['user_name']]);
         $message->setBody(
             '<h1>Поздравляем с победой</h1>' .
-            '<p>Здравствуйте, \[имя пользователя\]</p>' .
-            '<p>Ваша ставка для лота <a href="\[ссылка на лот\]">\[имя лота\]</a> победила.</p>' .
-            '<p>Перейдите по ссылке <a href="\[ссылка на страницу мои ставки\]">мои ставки</a>, чтобы связаться с автором объявления</p>' .
+            '<p>Здравствуйте, '.$winner['user_name'].'</p>' .
+            '<p>Ваша ставка для лота <a href="lot.php?id='.$winner['lot_id'].'">'.$winner['lot_title'].'</a> победила.</p>' .
+            '<p>Перейдите по ссылке <a href="my-bets.php">мои ставки</a>, чтобы связаться с автором объявления</p>' .
             '<small>Интернет Аукцион "YetiCave"</small>','text/html'
         );
 
