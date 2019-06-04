@@ -20,7 +20,7 @@ $is_main = 0;
 
 $dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
 if ($dbConnection == false) {
-    print("Ошибка подключения: ". mysqli_connect_error());
+    print("Ошибка подключения: " . mysqli_connect_error());
     die();
 } else {
     mysqli_set_charset($dbConnection, "utf8");
@@ -37,7 +37,7 @@ if ($dbConnection == false) {
         die();
     } else {
         $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        $i=0;
+        $i = 0;
         foreach ($bets as $bet) {
             $bet['minutesBeforeLotEnd'] = getMinutesBeforeLotEnd($bet['stop_date']);
             $bets[$i]['minutesBeforeLotEnd'] = $bet['minutesBeforeLotEnd'];
@@ -71,6 +71,17 @@ if ($dbConnection == false) {
     }
 }
 
-$pageContent = include_template('my-bets.php', ['bets' => $bets]);
-$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Мои ставки', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
+$pageContent = include_template('my-bets.php', [
+    'bets' => $bets
+]);
+
+$layoutContent = include_template('layout.php', [
+    'pageContent' => $pageContent,
+    'pageTitle' => 'Мои ставки',
+    'is_auth' => $is_auth,
+    'is_main' => $is_main,
+    'user_name' => $user_name,
+    'categories' => $categories
+]);
+
 print($layoutContent);

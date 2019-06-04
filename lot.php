@@ -21,8 +21,10 @@ $formError = false;
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $lotId = intval($_GET['id']);
-} else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $lotId = intval($_POST['lot_id']);
+} else {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $lotId = intval($_POST['lot_id']);
+    }
 }
 if ($lotId < 0) {
     http_response_code(404);
@@ -31,7 +33,7 @@ if ($lotId < 0) {
 
 $dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
 if ($dbConnection == false) {
-    print("Ошибка подключения: ". mysqli_connect_error());
+    print("Ошибка подключения: " . mysqli_connect_error());
     die();
 } else {
     mysqli_set_charset($dbConnection, "utf8");
@@ -39,28 +41,33 @@ if ($dbConnection == false) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
-
         if (empty($_POST['cost'])) {
             $formItemErrors['cost'] = true;
             $formParams['cost'] = '';
         } else {
             $formParams['cost'] = $_POST['cost'];
-            if (!is_numeric($formParams['cost']))
+            if (!is_numeric($formParams['cost'])) {
                 $formItemErrors['cost'] = true;
-            else if (intval($formParams['cost'])<0)
-                $formItemErrors['cost'] = true;
-            else if ($formParams['cost'] < $_POST['min_price'])
-                $formItemErrors['cost'] = true;
+            } else {
+                if (intval($formParams['cost']) < 0) {
+                    $formItemErrors['cost'] = true;
+                } else {
+                    if ($formParams['cost'] < $_POST['min_price']) {
+                        $formItemErrors['cost'] = true;
+                    }
+                }
+            }
         }
 
         $dateNow = strtotime('now');
         $dateLotStop = strtotime($_POST['lot_life_time']);
-        if($dateLotStop <= $dateNow) {
+        if ($dateLotStop <= $dateNow) {
             $formError = true;
         }
 
-        if (count($formItemErrors)>0)
+        if (count($formItemErrors) > 0) {
             $formError = true;
+        }
 
 
         if (!$formError) {
@@ -75,7 +82,7 @@ if ($dbConnection == false) {
                 die();
             } else {
                 mysqli_stmt_close($stmt);
-                header("Location: /lot.php?id=".$lotId);
+                header("Location: /lot.php?id=" . $lotId);
             }
         }
     }
@@ -91,7 +98,7 @@ if ($dbConnection == false) {
         die();
     } else {
         $records_count = mysqli_num_rows($result);
-        if ($records_count>0){
+        if ($records_count > 0) {
             $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
             $lot = $lots[0];
         } else {
@@ -110,7 +117,7 @@ if ($dbConnection == false) {
     }
 
     // Отображаем историю ставок
-    $sql = 'select b.id, id_bettor, id_lot, bet_date, bet_price, u.name, u.id from bets b join users u on u.id = id_bettor where b.id_lot = '.$lotId. ' order by bet_date desc';
+    $sql = 'select b.id, id_bettor, id_lot, bet_date, bet_price, u.name, u.id from bets b join users u on u.id = id_bettor where b.id_lot = ' . $lotId . ' order by bet_date desc';
     $result = mysqli_query($dbConnection, $sql);
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
@@ -129,6 +136,23 @@ if ($dbConnection == false) {
     $betForm['minBetPrice'] = $betForm['currentPrice'] + $lot['bet_step'];
 }
 
-$pageContent = include_template('lot.php', ['categories' => $categories , 'lot' => $lot, 'is_auth' => $is_auth, 'bets' => $bets, 'betForm' => $betForm, 'formError' => $formError, 'formParams' => $formParams]);
-$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => $lot['title'], 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
+$pageContent = include_template('lot.php', [
+    'categories' => $categories,
+    'lot' => $lot,
+    'is_auth' => $is_auth,
+    'bets' => $bets,
+    'betForm' => $betForm,
+    'formError' => $formError,
+    'formParams' => $formParams
+]);
+
+$layoutContent = include_template('layout.php', [
+    'pageContent' => $pageContent,
+    'pageTitle' => $lot['title'],
+    'is_auth' => $is_auth,
+    'is_main' => $is_main,
+    'user_name' => $user_name,
+    'categories' => $categories
+]);
+
 print($layoutContent);

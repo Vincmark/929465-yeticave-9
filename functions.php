@@ -1,4 +1,21 @@
 <?php
+
+
+/**
+ * Защита от XSS.
+ *
+ * @param string $str - Обрабатываемая строка.
+ * @return string     - Обработанная строка.
+ */
+function noXSS($rawStr): string
+{
+    $safeStr = '';
+    if (!empty($rawStr)) {
+        $safeStr = htmlspecialchars($rawStr);
+    }
+    return $safeStr;
+}
+
 /**
  * Форматирует цену:
  * - округляет до целого
@@ -103,11 +120,14 @@ function sendWinnerMails(array $winnerList)
     echo "Sending mails <br>";
 
     // Конфигурация траспорта
-    $transport = new Swift_SmtpTransport('smtp.example.org', 25);
+    $transport = (new Swift_SmtpTransport('phpdemo.ru', 25))
+        ->setUsername('keks@phpdemo.ru')
+        ->setPassword('htmlacademy')
+    ;
     foreach ($winnerList as $winner) {
         echo "New mail <br>";
         // Формирование сообщения
-        $message = new Swift_Message("Просмотры вашей гифки");
+        $message = new Swift_Message("Ваша ставка победила");
         echo "name ".$winner['user_name']."<br>";
         echo "email ".$winner['user_email']."<br>";
 
@@ -121,10 +141,12 @@ function sendWinnerMails(array $winnerList)
             '<small>Интернет Аукцион "YetiCave"</small>','text/html'
         );
 
-        $message->setFrom("mail@giftube.academy", "GifTube");
+        $message->setFrom("keks@phpdemo.ru", "keks@phpdemo.ru");
 
         // Отправка сообщения
         $mailer = new Swift_Mailer($transport);
-        $mailer->send($message);
+        //$result = $mailer->send($message);
+        //print($result);
     }
+    //var_dump(mail("aresrising.at@gmail.com","Test","Test"));
 }

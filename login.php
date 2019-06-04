@@ -23,23 +23,24 @@ $userIdentificationError = false;
 
 $dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
 if ($dbConnection == false) {
-    print("Ошибка подключения: ". mysqli_connect_error());
+    print("Ошибка подключения: " . mysqli_connect_error());
     die();
 } else {
     mysqli_set_charset($dbConnection, "utf8");
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST')
-{
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // email
     $formParams['email'] = '';
-    if (empty($_POST['email']))
+    if (empty($_POST['email'])) {
         $formItemErrors['email'] = true;
-    if (!isset($formItemErrors['email']) && (strlen($_POST['email']) === 0))
+    }
+    if (!isset($formItemErrors['email']) && (strlen($_POST['email']) === 0)) {
         $formItemErrors['email'] = true;
+    }
     if (!isset($formItemErrors['email'])) {
         $formParams['email'] = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
-        if ($formParams['email']!==false) {
+        if ($formParams['email'] !== false) {
             $formParams['email'] = mysqli_real_escape_string($dbConnection, $_POST['email']);
         } else {
             $formParams['email'] = mysqli_real_escape_string($dbConnection, $_POST['email']);
@@ -49,16 +50,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
     // password
     $formParams['password'] = '';
-    if (empty($_POST['password']))
+    if (empty($_POST['password'])) {
         $formItemErrors['password'] = true;
-    if (!isset($formItemErrors['password']) && (strlen($_POST['password']) === 0))
+    }
+    if (!isset($formItemErrors['password']) && (strlen($_POST['password']) === 0)) {
         $formItemErrors['password'] = true;
-    if (!isset($formItemErrors['password']))
+    }
+    if (!isset($formItemErrors['password'])) {
         $formParams['password'] = $_POST['password'];
+    }
 
 
-    if (count($formItemErrors)>0)
+    if (count($formItemErrors) > 0) {
         $formError = true;
+    }
 
     if (!$formError) {
         $sql = 'select id, email, name, password from users where email = ?';
@@ -101,7 +106,20 @@ if (!$result) {
     $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
+$pageContent = include_template('login.php', [
+    'formParams' => $formParams,
+    'formError' => $formError,
+    'formItemErrors' => $formItemErrors,
+    'userIdentificationError' => $userIdentificationError
+]);
 
-$pageContent = include_template('login.php', ['formParams' => $formParams, 'formError' => $formError, 'formItemErrors' => $formItemErrors, 'userIdentificationError' => $userIdentificationError]);
-$layoutContent = include_template('layout.php',['pageContent' => $pageContent, 'pageTitle' => 'Вход', 'is_auth' => $is_auth, 'is_main' => $is_main, 'user_name' => $user_name, 'categories' => $categories]);
+$layoutContent = include_template('layout.php', [
+    'pageContent' => $pageContent,
+    'pageTitle' => 'Вход',
+    'is_auth' => $is_auth,
+    'is_main' => $is_main,
+    'user_name' => $user_name,
+    'categories' => $categories
+]);
+
 print($layoutContent);
