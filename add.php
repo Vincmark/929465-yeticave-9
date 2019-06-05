@@ -5,7 +5,7 @@ require 'db.php';
 require 'functions.php';
 require 'helpers.php';
 
-if ($is_auth === 0){
+if ($is_auth === 0) {
     http_response_code(403);
     die();
 }
@@ -118,32 +118,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $formError = true;
     }
 
-
     // Сохраняем новый лот
     if (!$formError) {
+        $file['filename'] = $_FILES['image']['tmp_name'];
+        $file['dest'] = $file_path . $file_name;
 
-        $sql = 'insert into lots (id_category, id_author, title, description, lot_img, start_price, bet_step, stop_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        $stmt = mysqli_stmt_init($dbConnection);
-        mysqli_stmt_prepare($stmt, $sql);
-        $bindResult = mysqli_stmt_bind_param($stmt, 'iisssiis', $formParams['category'], $formParams['author'],
-            $formParams['lot-name'], $formParams['message'], $formParams['image'], $formParams['lot-rate'],
-            $formParams['lot-step'], $formParams['lot-date']);
-        $executeResult = mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        if (!$executeResult) {
-            print("Ошибка MySQL: " . mysqli_errno($dbConnection));
-            die();
-        } else {
-            $newLotId = mysqli_insert_id($dbConnection);
-            mysqli_stmt_close($stmt);
-            move_uploaded_file($_FILES['image']['tmp_name'], $file_path . $file_name);
+        $newLotId = saveNewLot($dbConnection, $formParams, $file);
+        if ($newLotId > 0) {
             header("Location: /lot.php?id=" . $newLotId);
         }
     }
 }
 
 $categories = getCategories($dbConnection);
-
 
 $pageContent = include_template('add.php', [
     'categories' => $categories,

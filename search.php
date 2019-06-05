@@ -37,14 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
 }
 
-$dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
-if ($dbConnection == false) {
-    print("Ошибка подключения: " . mysqli_connect_error());
-    die();
-} else {
-    mysqli_set_charset($dbConnection, "utf8");
-
-
     // Зачитываем категории
     $sql = 'select title,symbol_code from categories';
     $result = mysqli_query($dbConnection, $sql);
@@ -59,7 +51,6 @@ if ($dbConnection == false) {
 
         $sql = 'select count(*) as cnt from lots l join categories c on l.id_category = c.id where stop_date >="' . date('y-m-d',
                 strtotime('now')) . '" and MATCH(l.title,l.description) AGAINST("' . $query . '")';
-        //echo $sql;
         $result = mysqli_query($dbConnection, $sql);
         $items_count = mysqli_fetch_assoc($result)['cnt'];
 
@@ -93,9 +84,8 @@ if ($dbConnection == false) {
             }
         }
     }
-}
 
-
+    
 $pageContent = include_template('search.php', [
     'categories' => $categories,
     'lots' => $lots,

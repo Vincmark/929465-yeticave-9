@@ -1,18 +1,10 @@
 <?php
 
-//echo "Get Winner Works!";
 $winnerList = [];
 $error = false;
 
-$dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
-if ($dbConnection == false) {
-    print("Ошибка подключения: " . mysqli_connect_error());
-    die();
-} else {
-    mysqli_set_charset($dbConnection, "utf8");
-}
 
-// Зачитываем лоты, которые без виннера, и уже закончились
+// Зачитываем лоты, которые без победителя, но уже закончились
 if (!$error) {
     $sql = 'select id, title from lots where stop_date >="' . date('y-m-d',
             strtotime('now')) . '" and id_winner is null';

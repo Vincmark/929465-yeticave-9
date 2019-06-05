@@ -12,14 +12,6 @@ $formParams = [];
 $formItemErrors = [];
 $formError = false;
 
-$dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
-if ($dbConnection == false) {
-    print("Ошибка подключения: " . mysqli_connect_error());
-    die();
-} else {
-    mysqli_set_charset($dbConnection, "utf8");
-}
-
 // Обрабатываем добавление или просто показываем форму?
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // name
@@ -48,27 +40,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $formItemErrors['email'] = true;
         }
     }
-    if (!isset($formItemErrors['email'])) {
-        $sql = 'select * from users where email = ?';
-        $stmt = mysqli_stmt_init($dbConnection);
-        mysqli_stmt_prepare($stmt, $sql);
-        $bindResult = mysqli_stmt_bind_param($stmt, 's', $formParams['email']);
-        $executeResult = mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
 
-        if (!$executeResult) {
-            print("Ошибка MySQL: " . mysqli_errno($dbConnection));
-            die();
-        } else {
-            $num_rows = mysqli_num_rows($result);
-            if ($num_rows > 0) {
-                $formItemErrors['email'] = true;
-            }
-            mysqli_stmt_close($stmt);
+    // unique email check
+    if (!isset($formItemErrors['email'])) {
+        if (!checkForUniqueEmail($dbConnection, $formParams['email'])) {
+            $formItemErrors['email'] = true;
         }
     }
 
-    // password
+
+    // password check
     $formParams['password'] = '';
     if (empty($_POST['password'])) {
         $formItemErrors['password'] = true;
@@ -91,34 +72,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $formError = true;
     }
 
-
     // Сохраняем нового пользователя
     if (!$formError) {
-        $sql = 'insert into users (email, name, password, contact) VALUES (?, ?, ?, ?)';
-        $stmt = mysqli_stmt_init($dbConnection);
-        mysqli_stmt_prepare($stmt, $sql);
-        $bindResult = mysqli_stmt_bind_param($stmt, 'ssss', $formParams['email'], $formParams['name'],
-            $formParams['password'], $formParams['message']);
-        $executeResult = mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        if (!$executeResult) {
-            print("Ошибка MySQL: " . mysqli_errno($dbConnection));
-            die();
-        } else {
-            mysqli_stmt_close($stmt);
+        if (saveNewUser($dbConnection, $formParams)) {
             header("Location: /login.php");
         }
     }
 }
 
-// Зачитываем категории
-$sql = 'select id,title,symbol_code from categories';
-$result = mysqli_query($dbConnection, $sql);
-if (!$result) {
-    print("Ошибка MySQL: " . mysqli_error($dbConnection));
-} else {
-    $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
+$categories = getCategories($dbConnection);
 
 
 $pageContent = include_template('sign-up.php', [

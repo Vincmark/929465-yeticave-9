@@ -5,7 +5,6 @@ require 'db.php';
 require 'functions.php';
 require 'helpers.php';
 
-
 $is_main = 0;
 $lotId = -1;
 $formParams = [];
@@ -24,16 +23,8 @@ if ($lotId < 0) {
     die();
 }
 
-$dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
-if ($dbConnection == false) {
-    print("Ошибка подключения: " . mysqli_connect_error());
-    die();
-} else {
-    mysqli_set_charset($dbConnection, "utf8");
     // Записываем новую ставку
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-
         if (empty($_POST['cost'])) {
             $formItemErrors['cost'] = true;
             $formParams['cost'] = '';
@@ -64,44 +55,22 @@ if ($dbConnection == false) {
 
 
         if (!$formError) {
-            $sql = 'insert into bets (id_bettor, id_lot, bet_price) VALUES (?, ?, ?)';
-            $stmt = mysqli_stmt_init($dbConnection);
-            mysqli_stmt_prepare($stmt, $sql);
-            $bindResult = mysqli_stmt_bind_param($stmt, 'iii', $user_id, $lotId, $formParams['cost']);
-            $executeResult = mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            if (!$executeResult) {
-                print("Ошибка MySQL: " . mysqli_errno($dbConnection));
-                die();
-            } else {
-                mysqli_stmt_close($stmt);
+            $bet = ['user_id' => $user_id, 'lot_id' => $lotId, 'cost' => $formParams['cost']];
+            if (saveNewBet($dbConnection, $bet)){
                 header("Location: /lot.php?id=" . $lotId);
             }
         }
     }
 
     // Зачитываем лот
-    $sql = 'select l.id as id, l.title, description, start_price, bet_step, lot_img, stop_date, c.title as category_title from lots l join categories c on l.id_category = c.id where l.id=?';
-    $stmt = mysqli_prepare($dbConnection, $sql);
-    mysqli_stmt_bind_param($stmt, 'i', $lotId);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    if (!$result) {
-        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+    $lot = getLot($dbConnection, $lotId);
+    if (count($lot) === 0){
+        http_response_code(404);
         die();
-    } else {
-        $records_count = mysqli_num_rows($result);
-        if ($records_count > 0) {
-            $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            $lot = $lots[0];
-        } else {
-            http_response_code(404);
-            die();
-        }
     }
 
     $categories = getCategories($dbConnection);
-    $bets = getBets($dbConnection);
+    $bets = getBets($dbConnection, $lotId);
 
     // Отображаем форму для ставки
     $betForm = [];
@@ -111,7 +80,7 @@ if ($dbConnection == false) {
         $betForm['currentPrice'] = $lot['start_price'];
     }
     $betForm['minBetPrice'] = $betForm['currentPrice'] + $lot['bet_step'];
-}
+
 
 $pageContent = include_template('lot.php', [
     'categories' => $categories,

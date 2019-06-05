@@ -13,13 +13,6 @@ $formItemErrors = [];
 $formError = false;
 $userIdentificationError = false;
 
-$dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
-if ($dbConnection == false) {
-    print("Ошибка подключения: " . mysqli_connect_error());
-    die();
-} else {
-    mysqli_set_charset($dbConnection, "utf8");
-}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // email
@@ -57,46 +50,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $formError = true;
     }
 
+    // authentication
     if (!$formError) {
-        $sql = 'select id, email, name, password from users where email = ?';
-        $stmt = mysqli_stmt_init($dbConnection);
-        mysqli_stmt_prepare($stmt, $sql);
-        $bindResult = mysqli_stmt_bind_param($stmt, 's', $formParams['email']);
-        $executeResult = mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        if (!$executeResult) {
-            print("Ошибка MySQL: " . mysqli_errno($dbConnection));
-            die();
-        } else {
-            $num_rows = mysqli_num_rows($result);
-            if ($num_rows > 0) {
-                $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
-                if (password_verify($formParams['password'], $users[0]['password'])) {
-                    session_start();
-                    $_SESSION['username'] = $users[0]['name'];
-                    $_SESSION['user_id'] = $users[0]['id'];
-                    header("Location: /index.php");
-                } else {
-                    $userIdentificationError = true;
-                    $formError = true;
-                }
-            } else {
-                $userIdentificationError = true;
-                $formError = true;
-            }
-            mysqli_stmt_close($stmt);
+        $auth = userAuthentication($dbConnection, $formParams);
+        if ($auth['result']) {
+            session_start();
+            $_SESSION['username'] = $auth['username'];
+            $_SESSION['user_id'] = $auth['user_id'];
+            header("Location: /index.php");
         }
     }
 }
 
-// Зачитываем категории
-$sql = 'select id,title,symbol_code from categories';
-$result = mysqli_query($dbConnection, $sql);
-if (!$result) {
-    print("Ошибка MySQL: " . mysqli_error($dbConnection));
-} else {
-    $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
+$categories = getCategories($dbConnection);
 
 $pageContent = include_template('login.php', [
     'formParams' => $formParams,
