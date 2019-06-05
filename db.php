@@ -45,14 +45,6 @@ function getLots($dbConnection): array
         order by date_reg desc';
 
     return (sendQuery($dbConnection, $sql));
-
-//    $result = mysqli_query($dbConnection, $sql);
-//    if (!$result) {
-//        print("Ошибка MySQL: " . mysqli_error($dbConnection));
-//        die();
-//    } else {
-//        return (mysqli_fetch_all($result, MYSQLI_ASSOC));
-//    }
 }
 
 /**
@@ -68,12 +60,27 @@ function getCategories($dbConnection): array
         from categories';
 
     return (sendQuery($dbConnection, $sql));
+}
 
-//    $result = mysqli_query($dbConnection, $sql);
-//    if (!$result) {
-//        print("Ошибка MySQL: " . mysqli_error($dbConnection));
-//        die();
-//    } else {
-//        return (mysqli_fetch_all($result, MYSQLI_ASSOC));
-//    }
+/**
+ * Получаем список категорий
+ * @return mixed - список лотов
+ */
+function getBets($dbConnection): array
+{
+
+    $sql = 'select 
+      b.id, 
+      id_bettor, 
+      id_lot, 
+      bet_date, 
+      bet_price, 
+      u.name, 
+      u.id 
+      from bets b 
+      join users u on u.id = id_bettor 
+      where b.id_lot = ' . $lotId . ' 
+      order by bet_date desc';
+
+    return (sendQuery($dbConnection, $sql));
 }

@@ -1,17 +1,10 @@
 <?php
 
+require 'session.php';
+require 'db.php';
 require 'functions.php';
 require 'helpers.php';
 
-session_start();
-if (isset($_SESSION['username'])) {
-    $is_auth = 1;
-    $user_name = $_SESSION['username'];
-    $user_id = $_SESSION['user_id'];
-} else {
-    $is_auth = 0;
-    $user_name = '';
-}
 
 $is_main = 0;
 $lotId = -1;
@@ -107,24 +100,8 @@ if ($dbConnection == false) {
         }
     }
 
-    // Зачитываем категории
-    $sql = 'select title,symbol_code from categories';
-    $result = mysqli_query($dbConnection, $sql);
-    if (!$result) {
-        print("Ошибка MySQL: " . mysqli_error($dbConnection));
-    } else {
-        $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    }
-
-    // Отображаем историю ставок
-    $sql = 'select b.id, id_bettor, id_lot, bet_date, bet_price, u.name, u.id from bets b join users u on u.id = id_bettor where b.id_lot = ' . $lotId . ' order by bet_date desc';
-    $result = mysqli_query($dbConnection, $sql);
-    if (!$result) {
-        print("Ошибка MySQL: " . mysqli_error($dbConnection));
-        die();
-    } else {
-        $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    }
+    $categories = getCategories($dbConnection);
+    $bets = getBets($dbConnection);
 
     // Отображаем форму для ставки
     $betForm = [];

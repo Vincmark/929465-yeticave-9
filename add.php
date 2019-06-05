@@ -1,16 +1,11 @@
 <?php
 
+require 'session.php';
+require 'db.php';
 require 'functions.php';
 require 'helpers.php';
 
-session_start();
-if (isset($_SESSION['username'])) {
-    $is_auth = 1;
-    $user_name = $_SESSION['username'];
-    $user_id = $_SESSION['user_id'];
-} else {
-    $is_auth = 0;
-    $user_name = '';
+if ($is_auth === 0){
     http_response_code(403);
     die();
 }
@@ -22,13 +17,6 @@ $formParams = [];
 $formItemErrors = [];
 $formError = false;
 
-$dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
-if ($dbConnection == false) {
-    print("Ошибка подключения: " . mysqli_connect_error());
-    die();
-} else {
-    mysqli_set_charset($dbConnection, "utf8");
-}
 
 // Обрабатываем добавление или просто показываем форму?
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -154,14 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Зачитываем категории
-$sql = 'select id,title,symbol_code from categories';
-$result = mysqli_query($dbConnection, $sql);
-if (!$result) {
-    print("Ошибка MySQL: " . mysqli_error($dbConnection));
-} else {
-    $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
+$categories = getCategories($dbConnection);
 
 
 $pageContent = include_template('add.php', [
