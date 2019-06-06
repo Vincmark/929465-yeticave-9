@@ -1,0 +1,12 @@
+{
+    "name": "vincmark/929465-yeticave-9",
+    "authors": [
+        {
+            "name": "Vincmark",
+            "email": "44532137+Vincmark@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.2"
+    }
+}
