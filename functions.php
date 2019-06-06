@@ -43,14 +43,14 @@ function getHoursAndMinutesBeforeLotEnd(string $endDate): string
     $dateNow = strtotime('now');
     $dateEnd = strtotime($endDate);
     $dateDiff = $dateEnd - $dateNow;
-    if ($dateDiff<0){
+    if ($dateDiff < 0) {
         $hours = 0;
         $minutes = 0;
     } else {
-        $hours = floor($dateDiff/60/60);
-        $minutes = floor(($dateDiff-$hours*60*60)/60);
+        $hours = floor($dateDiff / 60 / 60);
+        $minutes = floor(($dateDiff - $hours * 60 * 60) / 60);
     }
-    return sprintf("%02d", $hours).":".sprintf("%02d", $minutes);
+    return sprintf("%02d", $hours) . ":" . sprintf("%02d", $minutes);
 }
 
 /**
@@ -62,7 +62,7 @@ function getMinutesBeforeLotEnd(string $endDate): int
 {
     $dateNow = strtotime('now');
     $dateEnd = strtotime($endDate);
-    return floor(($dateEnd - $dateNow)/60);
+    return floor(($dateEnd - $dateNow) / 60);
 }
 
 /**
@@ -99,12 +99,14 @@ function getTimeString(string $postDate): string
     $datePost = strtotime($postDate);
     $dateDiff = $dateNow - $datePost;
 
-    if ($dateDiff < 60*60) {
-        $result = floor($dateDiff/60).' мин назад';
-    } else if (($dateDiff > 60*60)&&($dateDiff <60*60*24)) {
-        $result = floor($dateDiff/60/60).' ч назад';
+    if ($dateDiff < 60 * 60) {
+        $result = floor($dateDiff / 60) . ' мин назад';
     } else {
-        $result = date("d.m.y в h:i", $datePost);         //19.03.17 в 12:20
+        if (($dateDiff > 60 * 60) && ($dateDiff < 60 * 60 * 24)) {
+            $result = floor($dateDiff / 60 / 60) . ' ч назад';
+        } else {
+            $result = date("d.m.y в h:i", $datePost);         //19.03.17 в 12:20
+        }
     }
     return $result;
 }
@@ -117,36 +119,27 @@ function getTimeString(string $postDate): string
  */
 function sendWinnerMails(array $winnerList)
 {
-    echo "Sending mails <br>";
-
     // Конфигурация траспорта
     $transport = (new Swift_SmtpTransport('phpdemo.ru', 25))
         ->setUsername('keks@phpdemo.ru')
-        ->setPassword('htmlacademy')
-    ;
+        ->setPassword('htmlacademy');
     foreach ($winnerList as $winner) {
-        echo "New mail <br>";
         // Формирование сообщения
         $message = new Swift_Message("Ваша ставка победила");
-        echo "name ".$winner['user_name']."<br>";
-        echo "email ".$winner['user_email']."<br>";
-
-
         $message->setTo([$winner['user_email'] => $winner['user_name']]);
-        $message->setBody(
-            '<h1>Поздравляем с победой</h1>' .
-            '<p>Здравствуйте, '.$winner['user_name'].'</p>' .
-            '<p>Ваша ставка для лота <a href="lot.php?id='.$winner['lot_id'].'">'.$winner['lot_title'].'</a> победила.</p>' .
-            '<p>Перейдите по ссылке <a href="my-bets.php">мои ставки</a>, чтобы связаться с автором объявления</p>' .
-            '<small>Интернет Аукцион "YetiCave"</small>','text/html'
-        );
 
+        $mailContent = include_template('email.php', [
+            'userName' => $winner['user_name'],
+            'lotId' => $winner['lot_id'],
+            'lotTitle' => $winner['lot_title']
+        ]);
+
+        $message->setBody($mailContent);
         $message->setFrom("keks@phpdemo.ru", "keks@phpdemo.ru");
 
         // Отправка сообщения
         $mailer = new Swift_Mailer($transport);
-        //$result = $mailer->send($message);
-        //print($result);
+        $result = $mailer->send($message);
+        print($result);
     }
-    //var_dump(mail("aresrising.at@gmail.com","Test","Test"));
 }

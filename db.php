@@ -285,6 +285,61 @@ function getBets($dbConnection, $lotId): array
 }
 
 /**
+ * Получаем последнюю ставку по лоту
+ * @param $dbConnection - база данных
+ * @param $lotId - лот, для которого получаем ставку
+ * @return array - список ставок
+ */
+function getLastBetForLot($dbConnection, $lotId): array
+{
+    $bets = [];
+    $sql = 'select 
+        b.id_bettor, 
+        b.id_lot, 
+        u.name, 
+        u.email 
+        from bets b 
+        join users u on b.id_bettor = u.id 
+        where b.id_lot =' . $lotId . ' 
+        order by b.bet_date desc';
+
+    $result = mysqli_query($dbConnection, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    } else {
+        $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+    return ($bets);
+}
+
+/**
+ * Сохраняем победителя для лота
+ * @param $dbConnection - база данных
+ * @param $lotId - лот, для которого получаем ставку
+ * @param $winnerId - пользователь-победитель
+ * @return bool - результат операции
+ */
+function saveWinner($dbConnection, $lotId, $winnerId): bool
+{
+    $isSaved = false;
+    $sql = 'update 
+        lots set 
+        id_winner=' . $winnerId . ' 
+        where id=' . $lotId;
+    $result = mysqli_query($dbConnection, $sql);
+    if (isset($result)) {
+        if (!$result) {
+            print("Ошибка MySQL: " . mysqli_error($dbConnection));
+            die();
+        } else {
+            $isSaved = true;
+        }
+    }
+    return ($isSaved);
+}
+
+/**
  * Получаем список ставок для пользователя
  * @param $dbConnection - база данных
  * @param $userId - пользователь, для которого получаем ставки
