@@ -50,6 +50,93 @@ function getLots($dbConnection): array
 }
 
 /**
+ * Получаем список лотов, которые без победителя, но уже закончились
+ * @param $dbConnection - база данных
+ * @return array - список лотов
+ */
+function getLotsForWinners($dbConnection): array
+{
+    $lots = [];
+
+    $sql = 'select 
+    id, 
+    title 
+    from lots 
+    where stop_date >="' . date('y-m-d', strtotime('now')) . '" 
+    and id_winner is null';
+
+    $result = mysqli_query($dbConnection, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    } else {
+        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+    return ($lots);
+}
+
+/**
+ * Получаем список лотов, которые без победителя, но уже закончились
+ * @param $dbConnection - база данных
+ * @return array - список лотов
+ */
+function getLastBetForWinner($dbConnection): array
+{
+    $lots = [];
+
+    $sql = 'select 
+    id, 
+    title 
+    from lots 
+    where stop_date >="' . date('y-m-d', strtotime('now')) . '" 
+    and id_winner is null';
+
+    $result = mysqli_query($dbConnection, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    } else {
+        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+    return ($lots);
+}
+
+/**
+ * Получаем список лотов по поиску с учетом пагинации
+ * @param $dbConnection - база данных
+ * @param $query - поисковый запрос
+ * @param $page_items - элементов на странице
+ * @param $offset - страница
+ * @return array - список лотов
+ */
+function getLotsForSearch($dbConnection, $query, $page_items, $offset): array
+{
+    $lots = [];
+    $sql = 'select 
+    l.id as lot_id, 
+    l.title, 
+    l.description, 
+    start_price, 
+    lot_img, 
+    stop_date, 
+    c.title as category_title 
+    from lots l 
+    join categories c on l.id_category = c.id 
+    where stop_date >="' . date('y-m-d', strtotime('now')) . '" 
+    and MATCH(l.title,l.description) AGAINST("' . $query . '")  
+    order by date_reg desc limit ' . $page_items . ' offset ' . $offset;
+
+    $result = mysqli_query($dbConnection, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    } else {
+        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+    return ($lots);
+}
+
+/**
  * Зачитываем лот
  * @param $dbConnection - база данных
  * @param $lotId - лот
@@ -85,6 +172,27 @@ function getLot($dbConnection, $lotId): array
         }
     }
     return ($lot);
+}
+
+/**
+ * Получаем количество лотов
+ * @param $dbConnection - база данных
+ * @param $query - поисковый запрос
+ * @return int - количество лотов
+ */
+function getLotCount($dbConnection, $query): int
+{
+    $lotsCnt = -1;
+    $sql = 'select count(*) as cnt from lots l join categories c on l.id_category = c.id where stop_date >="' . date('y-m-d',
+            strtotime('now')) . '" and MATCH(l.title,l.description) AGAINST("' . $query . '")';
+    $result = mysqli_query($dbConnection, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    } else {
+        $lotsCnt = mysqli_fetch_assoc($result)['cnt'];
+    }
+    return ($lotsCnt);
 }
 
 /**

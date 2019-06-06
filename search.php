@@ -37,55 +37,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
 }
 
-    // Зачитываем категории
-    $sql = 'select title,symbol_code from categories';
-    $result = mysqli_query($dbConnection, $sql);
-    if (!$result) {
-        print("Ошибка MySQL: " . mysqli_error($dbConnection));
-        die();
-    } else {
-        $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
+// Зачитываем категории
+$sql = 'select title,symbol_code from categories';
+$result = mysqli_query($dbConnection, $sql);
+if (!$result) {
+    print("Ошибка MySQL: " . mysqli_error($dbConnection));
+    die();
+} else {
+    $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+if (!$formError) {
+
+    $items_count = getLotCount($dbConnection, $query);
+
+    $pages_count = ceil($items_count / $page_items);
+    $offset = ($cur_page - 1) * $page_items;
+
+    $pages = range(1, $pages_count);
+    $pagination['prev'] = $cur_page - 1;
+    if ($pagination['prev'] < 1) {
+        $pagination['prev'] = 1;
     }
-
-    if (!$formError) {
-
-        $sql = 'select count(*) as cnt from lots l join categories c on l.id_category = c.id where stop_date >="' . date('y-m-d',
-                strtotime('now')) . '" and MATCH(l.title,l.description) AGAINST("' . $query . '")';
-        $result = mysqli_query($dbConnection, $sql);
-        $items_count = mysqli_fetch_assoc($result)['cnt'];
-
-        $pages_count = ceil($items_count / $page_items);
-        $offset = ($cur_page - 1) * $page_items;
-
-        $pages = range(1, $pages_count);
-        $pagination['prev'] = $cur_page - 1;
-        if ($pagination['prev'] < 1) {
-            $pagination['prev'] = 1;
-        }
-        $pagination['next'] = $cur_page + 1;
-        if ($pagination['next'] > $pages_count) {
-            $pagination['next'] = $cur_page;
-        }
-        $pagination['current'] = $cur_page;
-
-
-        // Зачитываем лоты
-        $sql = 'select l.id as lot_id, l.title, l.description, start_price, lot_img, stop_date, c.title as category_title from lots l join categories c on l.id_category = c.id where stop_date >="' . date('y-m-d',
-                strtotime('now')) . '" and MATCH(l.title,l.description) AGAINST("' . $query . '")  order by date_reg desc limit ' . $page_items . ' offset ' . $offset;
-        echo $sql;
-        $result = mysqli_query($dbConnection, $sql);
-        if (!$result) {
-            print("Ошибка MySQL: " . mysqli_error($dbConnection));
-            die();
-        } else {
-            $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            if (count($lots) === 0) {
-                $formError = true;
-            }
-        }
+    $pagination['next'] = $cur_page + 1;
+    if ($pagination['next'] > $pages_count) {
+        $pagination['next'] = $cur_page;
     }
+    $pagination['current'] = $cur_page;
 
-    
+    // Зачитываем лоты
+    $lots = getLotsForSearch($dbConnection, $query, $page_items, $offset);
+    if (count($lots) === 0) {
+        $formError = true;
+    }
+}
+
+
 $pageContent = include_template('search.php', [
     'categories' => $categories,
     'lots' => $lots,

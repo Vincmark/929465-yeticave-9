@@ -6,17 +6,7 @@ $error = false;
 
 // Зачитываем лоты, которые без победителя, но уже закончились
 if (!$error) {
-    $sql = 'select id, title from lots where stop_date >="' . date('y-m-d',
-            strtotime('now')) . '" and id_winner is null';
-    //echo $sql."<br>";
-    $result = mysqli_query($dbConnection, $sql);
-    if (!$result) {
-        print("Ошибка MySQL: " . mysqli_error($dbConnection));
-        die();
-    } else {
-        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        echo "Lots cnt=" . count($lots) . "<br>";
-    }
+    $lots = getLotsForWinners($dbConnection);
 }
 
 if (!$error) {
