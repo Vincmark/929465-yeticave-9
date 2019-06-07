@@ -82,7 +82,7 @@ function getLastBetForWinner($dbConnection): array
 {
     $lots = [];
 
-    $sql = 'select 
+    $sql = 'select ++
     id, 
     title 
     from lots 

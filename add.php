@@ -122,7 +122,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!$formError) {
         $file['filename'] = $_FILES['image']['tmp_name'];
         $file['dest'] = $file_path . $file_name;
-
         $newLotId = saveNewLot($dbConnection, $formParams, $file);
         if ($newLotId > 0) {
             header("Location: /lot.php?id=" . $newLotId);
