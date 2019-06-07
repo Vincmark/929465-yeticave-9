@@ -6,9 +6,9 @@ if ($dbConnection == false) {
     $dbError = true;
     print("Ошибка подключения: " . mysqli_connect_error());
     die();
-} else {
-    mysqli_set_charset($dbConnection, "utf8");
 }
+mysqli_set_charset($dbConnection, "utf8");
+
 
 /**
  * Делаем запрос к базе данных
