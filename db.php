@@ -22,9 +22,8 @@ function sendQuery($dbConnection, $sql): array
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        return (mysqli_fetch_all($result, MYSQLI_ASSOC));
     }
+    return (mysqli_fetch_all($result, MYSQLI_ASSOC));
 }
 
 /**
@@ -69,9 +68,8 @@ function getLotsForWinners($dbConnection): array
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
+    $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
     return ($lots);
 }
 
@@ -95,9 +93,8 @@ function getLastBetForWinner($dbConnection): array
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
+    $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
     return ($lots);
 }
 
@@ -130,9 +127,8 @@ function getLotsForSearch($dbConnection, $query, $page_items, $offset): array
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
+    $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
     return ($lots);
 }
 
@@ -163,14 +159,14 @@ function getLot($dbConnection, $lotId): array
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        if (count($lots) > 0) {
-            $lot = $lots[0];
-        } else {
-            $lot = [];
-        }
     }
+    $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    if (count($lots) > 0) {
+        $lot = $lots[0];
+    } else {
+        $lot = [];
+    }
+
     return ($lot);
 }
 
@@ -189,9 +185,9 @@ function getLotCount($dbConnection, $query): int
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        $lotsCnt = mysqli_fetch_assoc($result)['cnt'];
     }
+    $lotsCnt = mysqli_fetch_assoc($result)['cnt'];
+
     return ($lotsCnt);
 }
 
@@ -235,11 +231,11 @@ function saveNewLot($dbConnection, $lot, $file): int
     if (!$executeResult) {
         print("Ошибка MySQL: " . mysqli_errno($dbConnection));
         die();
-    } else {
-        $newLotId = mysqli_insert_id($dbConnection);
-        mysqli_stmt_close($stmt);
-        move_uploaded_file($file['filename'], $file['dest']);
     }
+    $newLotId = mysqli_insert_id($dbConnection);
+    mysqli_stmt_close($stmt);
+    move_uploaded_file($file['filename'], $file['dest']);
+
     return ($newLotId);
 }
 
@@ -307,9 +303,8 @@ function getLastBetForLot($dbConnection, $lotId): array
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
+    $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
     return ($bets);
 }
 
@@ -332,9 +327,8 @@ function saveWinner($dbConnection, $lotId, $winnerId): bool
         if (!$result) {
             print("Ошибка MySQL: " . mysqli_error($dbConnection));
             die();
-        } else {
-            $isSaved = true;
         }
+        $isSaved = true;
     }
     return ($isSaved);
 }
@@ -401,10 +395,10 @@ function saveNewBet($dbConnection, $bet): bool
     if (!$executeResult) {
         print("Ошибка MySQL: " . mysqli_errno($dbConnection));
         die();
-    } else {
-        $isSaved = true;
-        mysqli_stmt_close($stmt);
     }
+    $isSaved = true;
+    mysqli_stmt_close($stmt);
+
     return ($isSaved);
 }
 
@@ -428,13 +422,13 @@ function checkForUniqueEmail($dbConnection, $email): bool
     if (!$executeResult) {
         print("Ошибка MySQL: " . mysqli_errno($dbConnection));
         die();
-    } else {
-        $num_rows = mysqli_num_rows($result);
-        if ($num_rows > 0) {
-            $isUnique = false;
-        }
-        mysqli_stmt_close($stmt);
     }
+    $num_rows = mysqli_num_rows($result);
+    if ($num_rows > 0) {
+        $isUnique = false;
+    }
+    mysqli_stmt_close($stmt);
+
     return ($isUnique);
 }
 
@@ -457,11 +451,9 @@ function saveNewUser($dbConnection, $user): bool
     if (!$executeResult) {
         print("Ошибка MySQL: " . mysqli_errno($dbConnection));
         die();
-    } else {
-
-        $isSaved = true;
-        mysqli_stmt_close($stmt);
     }
+    $isSaved = true;
+    mysqli_stmt_close($stmt);
 
     return ($isSaved);
 }
@@ -485,21 +477,21 @@ function userAuthentication($dbConnection, $user): array
     if (!$executeResult) {
         print("Ошибка MySQL: " . mysqli_errno($dbConnection));
         die();
-    } else {
-        $num_rows = mysqli_num_rows($result);
-        if ($num_rows > 0) {
-            $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            if (password_verify($user['password'], $users[0]['password'])) {
-                $authResult['username'] = $users[0]['name'];
-                $authResult['user_id'] = $users[0]['id'];
-            } else {
-                $authResult['result'] = false;
-            }
+    }
+    $num_rows = mysqli_num_rows($result);
+    if ($num_rows > 0) {
+        $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        if (password_verify($user['password'], $users[0]['password'])) {
+            $authResult['username'] = $users[0]['name'];
+            $authResult['user_id'] = $users[0]['id'];
         } else {
             $authResult['result'] = false;
         }
-        mysqli_stmt_close($stmt);
+    } else {
+        $authResult['result'] = false;
     }
+    mysqli_stmt_close($stmt);
+
 
     return ($authResult);
 }

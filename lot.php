@@ -74,10 +74,9 @@ if ($lotId < 0) {
 
     // Отображаем форму для ставки
     $betForm = [];
+    $betForm['currentPrice'] = $lot['start_price'];
     if (count($bets) > 0) {
         $betForm['currentPrice'] = $bets[0]['bet_price'];
-    } else {
-        $betForm['currentPrice'] = $lot['start_price'];
     }
     $betForm['minBetPrice'] = $betForm['currentPrice'] + $lot['bet_step'];
 
