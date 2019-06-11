@@ -1,23 +1,11 @@
-    <section class="promo">
-        <h2 class="promo__title">Нужен стафф для катки?</h2>
-        <p class="promo__text">На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное снаряжение.</p>
-        <ul class="promo__list">
-            <?php foreach ($categories as $category): ?>
-                <li class="promo__item promo__item--<?= $category['symbol_code'] ?>">
-                    <a class="promo__link" href="all-lots.php?category=<?= $category['id'] ?>"><?= $category['title'] ?></a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </section>
+<div class="container">
     <section class="lots">
-        <div class="lots__header">
-            <h2>Открытые лоты</h2>
-        </div>
+        <h2>Все лоты в категории <span><?= $category['title'] ?></span></h2>
         <ul class="lots__list">
             <?php foreach ($lots as $lot): ?>
                 <li class="lots__item lot">
                     <div class="lot__image">
-                        <img src="/uploads/<?= $lot['lot_img'] ?>" width="350" height="260" alt="">
+                        <img src="/uploads/<?= $lot['lot_img'] ?>" width="350" height="260" alt="<?= htmlspecialchars($lot['title']) ?>">
                     </div>
                     <div class="lot__info">
                         <span class="lot__category"><?= $lot['category_title'] ?></span>
@@ -36,3 +24,17 @@
             <?php endforeach; ?>
         </ul>
     </section>
+    <?php if (count($pages) > 1):?>
+        <ul class="pagination-list">
+            <li class="pagination-item pagination-item-prev"><a href="all-lots.php?category=<?= $category['id'] ?>&page=<?= $pagination['prev'] ?>">Назад</a></li>
+            <?php foreach ($pages as $page): ?>
+                <?php if ($pagination['current'] == $page): ?>
+                    <li class="pagination-item pagination-item-active"><a><?= $page ?></a></li>
+                <?php else: ?>
+                    <li class="pagination-item"><a href="all-lots.php?category=<?= $category['id'] ?>&page=<?= $page ?>"><?= $page ?></a></li>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <li class="pagination-item pagination-item-next"><a href="all-lots.php?category=<?= $category['id'] ?>&page=<?= $pagination['next'] ?>">Вперед</a></li>
+        </ul>
+    <?php endif; ?>
+</div>

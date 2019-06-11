@@ -6,9 +6,9 @@
                 <tr class="rates__item">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= $bet['lot_title'] ?>">
+                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= htmlspecialchars($bet['lot_title']) ?>">
                         </div>
-                        <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= $bet['lot_title'] ?></a></h3>
+                        <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= htmlspecialchars($bet['lot_title']) ?></a></h3>
                     </td>
                     <td class="rates__category">
                         <?= $bet['category_title'] ?>
@@ -27,10 +27,10 @@
                 <tr class="rates__item rates__item--win">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= $bet['lot_title'] ?>">
+                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= htmlspecialchars($bet['lot_title']) ?>">
                         </div>
                         <div>
-                            <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= $bet['lot_title'] ?></a></h3>
+                            <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= htmlspecialchars($bet['lot_title']) ?></a></h3>
                             <p><?= $bet['contact'] ?></p>
                         </div>
                     </td>
@@ -51,9 +51,9 @@
                 <tr class="rates__item rates__item--end">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= $bet['lot_title'] ?>">
+                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= htmlspecialchars($bet['lot_title']) ?>">
                         </div>
-                        <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= $bet['lot_title'] ?></a></h3>
+                        <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= htmlspecialchars($bet['lot_title']) ?></a></h3>
                     </td>
                     <td class="rates__category">
                         <?= $bet['category_title'] ?>
@@ -72,9 +72,9 @@
                 <tr class="rates__item">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= $bet['lot_title'] ?>">
+                            <img src="/uploads/<?= $bet['lot_img'] ?>" width="54" height="40" alt="<?= htmlspecialchars($bet['lot_title']) ?>">
                         </div>
-                        <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= $bet['lot_title'] ?></a></h3>
+                        <h3 class="rates__title"><a href="lot.php?id=<?= $bet['lot_id'] ?>"><?= htmlspecialchars($bet['lot_title']) ?></a></h3>
                     </td>
                     <td class="rates__category">
                         <?= $bet['category_title'] ?>

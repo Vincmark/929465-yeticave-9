@@ -21,33 +21,33 @@ $formError = false;
 // Обрабатываем добавление или просто показываем форму?
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // lot-name
+    $formParams['lot-name'] = '';
     if (empty($_POST['lot-name'])) {
         $formItemErrors['lot-name'] = true;
-        $formParams['lot-name'] = '';
     } else {
         $formParams['lot-name'] = mysqli_real_escape_string($dbConnection, $_POST['lot-name']);
     }
 
     // category
+    $formParams['category'] = '';
     if (empty($_POST['category'])) {
         $formItemErrors['category'] = true;
-        $formParams['category'] = '';
     } else {
         $formParams['category'] = $_POST['category'];
     }
 
     // message
+    $formParams['message'] = '';
     if (empty($_POST['message'])) {
         $formItemErrors['message'] = true;
-        $formParams['message'] = '';
     } else {
         $formParams['message'] = mysqli_real_escape_string($dbConnection, $_POST['message']);
     }
 
     // lot-rate
+    $formParams['lot-rate'] = '';
     if (empty($_POST['lot-rate'])) {
         $formItemErrors['lot-rate'] = true;
-        $formParams['lot-rate'] = '';
     } else {
         $formParams['lot-rate'] = $_POST['lot-rate'];
         if (!is_numeric($formParams['lot-rate'])) {
@@ -60,9 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // lot-step
+    $formParams['lot-step'] = '';
     if (empty($_POST['lot-step'])) {
         $formItemErrors['lot-step'] = true;
-        $formParams['lot-step'] = '';
     } else {
         $formParams['lot-step'] = $_POST['lot-step'];
         if (((string)intval($formParams['lot-step'])) !== $formParams['lot-step']) {
@@ -75,9 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // lot-date
+    $formParams['lot-date'] = '';
     if (empty($_POST['lot-date'])) {
         $formItemErrors['lot-date'] = true;
-        $formParams['lot-date'] = '';
     } else {
         $formParams['lot-date'] = $_POST['lot-date'];
         if (!is_date_valid($formParams['lot-date'])) {

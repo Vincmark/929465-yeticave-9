@@ -2,7 +2,7 @@
 
 $dbError = false;
 $dbConnection = mysqli_connect("localhost", "root", "", "yeticave");
-if ($dbConnection == false) {
+if ($dbConnection === false) {
     $dbError = true;
     print("Ошибка подключения: " . mysqli_connect_error());
     die();
@@ -82,7 +82,7 @@ function getLastBetForWinner($dbConnection): array
 {
     $lots = [];
 
-    $sql = 'select ++
+    $sql = 'select
     id, 
     title 
     from lots 
@@ -120,9 +120,42 @@ function getLotsForSearch($dbConnection, $query, $page_items, $offset): array
     from lots l 
     join categories c on l.id_category = c.id 
     where stop_date >="' . date('y-m-d', strtotime('now')) . '" 
-    and MATCH(l.title,l.description) AGAINST("' . $query . '")  
+    and MATCH(l.title,l.description) AGAINST("' . mysqli_real_escape_string($dbConnection, $query) . '")  
     order by date_reg desc limit ' . $page_items . ' offset ' . $offset;
 
+    $result = mysqli_query($dbConnection, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    }
+    $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return ($lots);
+}
+
+/**
+ * Получаем список лотов по категории с учетом пагинации
+ * @param $dbConnection - база данных
+ * @param $categoryId - категория
+ * @param $page_items - элементов на странице
+ * @param $offset - страница
+ * @return array - список лотов
+ */
+function getLotsForCategory($dbConnection, $categoryId, $page_items, $offset): array
+{
+    $lots = [];
+    $sql = 'select 
+    l.id as lot_id, 
+    l.title, 
+    l.description, 
+    start_price, 
+    lot_img, 
+    stop_date, 
+    c.title as category_title 
+    from lots l 
+    join categories c on l.id_category = c.id 
+    where stop_date >="' . date('y-m-d', strtotime('now')) . '" 
+    and l.id_category=' . $categoryId . '  
+    order by date_reg desc limit ' . $page_items . ' offset ' . $offset;
     $result = mysqli_query($dbConnection, $sql);
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
@@ -142,6 +175,7 @@ function getLot($dbConnection, $lotId): array
 {
     $sql = 'select l.id as id, 
         l.title, 
+       id_author,
         description, 
         start_price, 
         bet_step, 
@@ -180,7 +214,31 @@ function getLotCount($dbConnection, $query): int
 {
     $lotsCnt = -1;
     $sql = 'select count(*) as cnt from lots l join categories c on l.id_category = c.id where stop_date >="' . date('y-m-d',
-            strtotime('now')) . '" and MATCH(l.title,l.description) AGAINST("' . $query . '")';
+            strtotime('now')) . '" and MATCH(l.title,l.description) AGAINST("' . mysqli_real_escape_string($dbConnection,
+            $query) . '")';
+    $result = mysqli_query($dbConnection, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    }
+    $lotsCnt = mysqli_fetch_assoc($result)['cnt'];
+
+    return ($lotsCnt);
+}
+
+/**
+ * Получаем количество лотов для категории
+ * @param $dbConnection - база данных
+ * @param $categoryId - категория
+ * @return int - количество лотов
+ */
+function getLotCountByCategory($dbConnection, $categoryId): int
+{
+    $sql = 'select count(*) as cnt 
+        from lots l 
+        join categories c on l.id_category = c.id
+        where stop_date >="' . date('y-m-d', strtotime('now')) . '" 
+        and l.id_category=' . $categoryId;
     $result = mysqli_query($dbConnection, $sql);
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
@@ -226,7 +284,6 @@ function saveNewLot($dbConnection, $lot, $file): int
 
     $executeResult = mysqli_stmt_execute($stmt);
     mysqli_stmt_get_result($stmt);
-    echo $sql;
 
     if (!$executeResult) {
         print("Ошибка MySQL: " . mysqli_errno($dbConnection));
@@ -254,6 +311,38 @@ function getCategories($dbConnection): array
         from categories';
 
     return (sendQuery($dbConnection, $sql));
+}
+
+/**
+ * Получаем категорию по id
+ * @param $dbConnection - база данных
+ * @param $categoryId - категория
+ * @return array - категория
+ */
+function getCategory($dbConnection, $categoryId): array
+{
+    $sql = 'select id, 
+       title, 
+       symbol_code 
+        from categories  
+        where id=?';
+
+    $stmt = mysqli_prepare($dbConnection, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $categoryId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($dbConnection));
+        die();
+    }
+    $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    if (count($categories) > 0) {
+        $category = $categories[0];
+    } else {
+        $category = [];
+    }
+
+    return ($category);
 }
 
 /**
@@ -370,9 +459,8 @@ function getBetsForUser($dbConnection, $userId): array
     if (!$result) {
         print("Ошибка MySQL: " . mysqli_error($dbConnection));
         die();
-    } else {
-        $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
+    $bets = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     return ($bets);
 }

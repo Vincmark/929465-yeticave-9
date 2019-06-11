@@ -37,15 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
 }
 
-// Зачитываем категории
-$sql = 'select title,symbol_code from categories';
-$result = mysqli_query($dbConnection, $sql);
-if (!$result) {
-    print("Ошибка MySQL: " . mysqli_error($dbConnection));
-    die();
-} else {
-    $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
+
 
 if (!$formError) {
 
@@ -72,6 +64,8 @@ if (!$formError) {
     }
 }
 
+// Зачитываем категории
+$categories = getCategories($dbConnection);
 
 $pageContent = include_template('search.php', [
     'categories' => $categories,
@@ -84,7 +78,7 @@ $pageContent = include_template('search.php', [
 
 $layoutContent = include_template('layout.php', [
     'pageContent' => $pageContent,
-    'pageTitle' => 'Результаты поиска',
+    'pageTitle' => 'Результаты поиска по запросу '.$query,
     'is_auth' => $is_auth,
     'is_main' => $is_main,
     'user_name' => $user_name,

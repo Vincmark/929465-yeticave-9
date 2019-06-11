@@ -4,10 +4,10 @@
 /**
  * Защита от XSS.
  *
- * @param string $str - Обрабатываемая строка.
+ * @param string $rawStr - Обрабатываемая строка.
  * @return string     - Обработанная строка.
  */
-function noXSS($rawStr): string
+function noXSS(string $rawStr): string
 {
     $safeStr = '';
     if (!empty($rawStr)) {
@@ -35,7 +35,7 @@ function preparePrice(int $price): string
 
 /**
  * Возвращает строку с часами и минутами до конца жизни лота
- *
+ * @param string $endDate дата окончания жизни лота
  * @return string
  */
 function getHoursAndMinutesBeforeLotEnd(string $endDate): string
@@ -55,7 +55,7 @@ function getHoursAndMinutesBeforeLotEnd(string $endDate): string
 
 /**
  * Возвращает количество минут до конца жизни ставки
- *
+ * @param string $endDate дата окончания жизни лота
  * @return int
  */
 function getMinutesBeforeLotEnd(string $endDate): int
@@ -115,7 +115,6 @@ function getTimeString(string $postDate): string
  * Рассылает письма победителям
  *
  * @param array $winnerList список победителей с параметрами для отправки писем
- * @return bool
  */
 function sendWinnerMails(array $winnerList)
 {

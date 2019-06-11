@@ -7,17 +7,19 @@ require 'helpers.php';
 
 $is_main = 0;
 
-
 $formParams = [];
 $formItemErrors = [];
 $formError = false;
 $userIdentificationError = false;
 
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // email
     $formParams['email'] = '';
-    if (empty($_POST['email'])) {
+
+    if (!isset($_POST['email'])) {
+        $formItemErrors['email'] = true;
+    }
+    if (!isset($formItemErrors['email']) && (empty($_POST['email']))) {
         $formItemErrors['email'] = true;
     }
     if (!isset($formItemErrors['email']) && (strlen($_POST['email']) === 0)) {
@@ -35,7 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // password
     $formParams['password'] = '';
-    if (empty($_POST['password'])) {
+
+    if (!isset($_POST['password'])) {
+        $formItemErrors['password'] = true;
+    }
+
+    if (!isset($formItemErrors['password']) && (empty($_POST['password']))) {
         $formItemErrors['password'] = true;
     }
     if (!isset($formItemErrors['password']) && (strlen($_POST['password']) === 0)) {

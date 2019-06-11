@@ -1,16 +1,16 @@
 
 <section class="lot-item container">
-      <h2><?= $lot['title'] ?></h2>
+      <h2><?= htmlspecialchars($lot['title']) ?></h2>
       <div class="lot-item__content">
         <div class="lot-item__left">
           <div class="lot-item__image">
             <img src="/uploads/<?= $lot['lot_img'] ?>" width="730" height="548" alt="Сноуборд">
           </div>
           <p class="lot-item__category">Категория: <span><?= $lot['category_title'] ?></span></p>
-          <p class="lot-item__description"><?= $lot['description'] ?></p>
+          <p class="lot-item__description"><?= htmlspecialchars($lot['description']) ?></p>
         </div>
         <div class="lot-item__right">
-          <?php if ($is_auth):?>
+          <?php if ($showBetForm):?>
             <div class="lot-item__state">
             <div class="lot-item__timer timer <?= lessThanHourBeforeLotEnd($lot['stop_date']) ? 'timer--finishing' : ''?> ">
                 <?= getHoursAndMinutesBeforeLotEnd($lot['stop_date']); ?>
@@ -43,7 +43,7 @@
     <table class="history__list">
         <?php foreach ($bets as $bet): ?>
         <tr class="history__item">
-            <td class="history__name"><?= $bet['name'] ?></td>
+            <td class="history__name"><?= htmlspecialchars($bet['name']) ?></td>
             <td class="history__price"><?= $bet['bet_price'] ?> р</td>
             <td class="history__time"><?= getTimeString($bet['bet_date']) ?></td>
         </tr>

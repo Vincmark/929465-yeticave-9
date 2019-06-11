@@ -1,7 +1,7 @@
 <?php
+//phpinfo();
 
 require_once "vendor/autoload.php";
-
 
 require 'session.php';
 require 'db.php';
@@ -25,7 +25,8 @@ $layoutContent = include_template('layout.php', [
     'is_auth' => $is_auth,
     'is_main' => $is_main,
     'user_name' => $user_name,
-    'categories' => $categories
+    'categories' => $categories,
+    'lots' => $lots
 ]);
 
 print($layoutContent);

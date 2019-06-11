@@ -16,16 +16,27 @@ $formError = false;
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // name
     $formParams['name'] = '';
-    if (empty($_POST['name'])) {
+
+    if (!isset($_POST['name'])) {
         $formItemErrors['name'] = true;
     }
+
+    if (!isset($formItemErrors['name']) && (empty($_POST['name']))) {
+        $formItemErrors['name'] = true;
+    }
+
     if (!isset($formItemErrors['name']) && (strlen($_POST['name']) > 0)) {
         $formParams['name'] = mysqli_real_escape_string($dbConnection, $_POST['name']);
     }
 
     // email
     $formParams['email'] = '';
-    if (empty($_POST['email'])) {
+
+    if (!isset($_POST['email'])) {
+        $formItemErrors['email'] = true;
+    }
+
+    if (!isset($formItemErrors['email']) && (empty($_POST['email']))) {
         $formItemErrors['email'] = true;
     }
     if (!isset($formItemErrors['email']) && (strlen($_POST['email']) === 0)) {
@@ -51,7 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // password check
     $formParams['password'] = '';
-    if (empty($_POST['password'])) {
+
+    if (!isset($_POST['password'])) {
+        $formItemErrors['password'] = true;
+    }
+
+    if (!isset($formItemErrors['password']) && (empty($_POST['password']))) {
         $formItemErrors['password'] = true;
     }
     if (!isset($formItemErrors['password']) && (strlen($_POST['password']) > 0)) {
@@ -60,7 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // message
     $formParams['message'] = '';
-    if (empty($_POST['message'])) {
+
+    if (!isset($_POST['message'])) {
+        $formItemErrors['message'] = true;
+    }
+
+    if (!isset($formItemErrors['message']) && (empty($_POST['message']))) {
         $formItemErrors['message'] = true;
     }
     if (!isset($formItemErrors['message']) && (strlen($_POST['message']) > 0)) {
